@@ -1417,13 +1417,10 @@ const db = firebase.database();
 
 async function fbGet(p){
   try{
-    console.log('[FB] GET', p);
     const s = await db.ref(p).get();
-    console.log('[FB] GET result', p, s.exists());
     return s.exists() ? s.val() : null;
   } catch(e){
-    console.error('[FB] GET error', p, e);
-    toast('Firebase 오류: ' + e.message);
+    console.error('FB error:', e);
     return null;
   }
 }
@@ -1585,14 +1582,7 @@ async function doLogin(){
   if(phone.length<10){toast('올바른 번호를 입력해주세요.');return;}
   if(pw.length<6){toast('비밀번호 6자리를 입력해주세요.');return;}
   toast('확인 중...');
-  let u;
-  try {
-    u = await findUser(name, phone, pw);
-  } catch(err) {
-    toast('오류: ' + err.message);
-    console.error('doLogin error:', err);
-    return;
-  }
+  const u = await findUser(name, phone, pw);
   if(u){
     saveLogin(u.name, u.phone);
     document.getElementById('page-user').classList.add('hidden');
@@ -1641,14 +1631,7 @@ async function goStep2(){
   if(!name){toast('이름을 입력해주세요.');return;}
   if(phone.length<10){toast('올바른 번호를 입력해주세요.');return;}
   toast('확인 중...');
-  let users;
-  try {
-    users = await getUsers();
-  } catch(err) {
-    toast('오류: ' + err.message);
-    console.error('goStep2 error:', err);
-    return;
-  }
+  const users = await getUsers();
   if(users.find(u=>u.name===name&&u.phone===phone)){
     toast('이미 등록된 계정이에요. 비밀번호 전송 요청을 이용해주세요.');
     return;
