@@ -1397,11 +1397,12 @@ tbody tr.selected td { background: #FFF5E6; }
 
 <div id="toast"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/firebase@10.12.0/firebase-app-compat.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/firebase@10.12.0/firebase-database-compat.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script>
-function showLoading(msg){ toast(msg||'처리 중...'); }
-function hideLoading(){ }
+
+function showLoading(msg){ const t=document.getElementById('toast'); if(t){t.textContent=msg||'처리 중...';t.classList.add('show');} }
+function hideLoading(){ const t=document.getElementById('toast'); if(t) t.classList.remove('show'); }
 
 const firebaseConfig = {
   apiKey: "AIzaSyAPBBQobHOtgCn1beBHS3KN9SBBLciYgSk",
@@ -1415,13 +1416,22 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
+// 연결 상태 모니터링
+db.ref('.info/connected').on('value', function(snap) {
+  if (snap.val() === true) {
+    console.log('Firebase connected ✓');
+  } else {
+    console.log('Firebase disconnected');
+  }
+});
+
 async function fbGet(p){
   try{
     const s = await db.ref(p).get();
     return s.exists() ? s.val() : null;
   } catch(e){
-    console.error('FB error:', e);
-    return null;
+    console.error('FB error:', p, e.code, e.message);
+    throw e;
   }
 }
 async function fbSet(p,v){ await db.ref(p).set(v); }
@@ -1581,15 +1591,26 @@ async function doLogin(){
   if(!name){toast('이름을 입력해주세요.');return;}
   if(phone.length<10){toast('올바른 번호를 입력해주세요.');return;}
   if(pw.length<6){toast('비밀번호 6자리를 입력해주세요.');return;}
-  toast('확인 중...');
-  const u = await findUser(name, phone, pw);
+  toast('1단계: Firebase 연결 중...');
+  let u;
+  try {
+    u = await Promise.race([
+      findUser(name, phone, pw),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('연결 시간 초과. 와이파이/데이터 확인 후 재시도해주세요.')), 30000))
+    ]);
+    toast('2단계: 응답 받음');
+  } catch(e) {
+    toast('오류: ' + e.message);
+    console.error('doLogin error:', e);
+    return;
+  }
   if(u){
     saveLogin(u.name, u.phone);
     document.getElementById('page-user').classList.add('hidden');
     document.getElementById('homeWelcome').innerHTML=`<strong>${esc(u.name)}</strong>님, 환영해요!`;
     document.getElementById('page-home').classList.add('active');
   } else {
-    toast('이름, 번호, 비밀번호를 다시 확인해주세요.');
+    toast('계정을 찾을 수 없어요. 이름/번호/비밀번호 확인해주세요.');
   }
 }
 function doLogout(){
@@ -1631,7 +1652,14 @@ async function goStep2(){
   if(!name){toast('이름을 입력해주세요.');return;}
   if(phone.length<10){toast('올바른 번호를 입력해주세요.');return;}
   toast('확인 중...');
-  const users = await getUsers();
+  let users;
+  try {
+    users = await getUsers();
+  } catch(e) {
+    toast('연결 오류가 발생했어요. 잠시 후 다시 시도해주세요.');
+    console.error('goStep2 error:', e);
+    return;
+  }
   if(users.find(u=>u.name===name&&u.phone===phone)){
     toast('이미 등록된 계정이에요. 비밀번호 전송 요청을 이용해주세요.');
     return;
@@ -1647,12 +1675,19 @@ async function doSetPw(){
   if(pw!==pw2){toast('비밀번호가 일치하지 않아요.');return;}
   const name=document.getElementById('s-name').value.trim();
   const phone=document.getElementById('s-phone').value.replace(/\D/g,'');
-  showLoading('저장 중...');
-  await addUser(name, phone, pw, new Date().toLocaleString('ko-KR'));
-  hideLoading();
-  document.getElementById('ss2').style.display='none';
-  document.getElementById('ssDone').style.display='block';
-  toast('✓ 저장됐어요.');
+  toast('1단계: Firebase 저장 중...');
+  try {
+    await Promise.race([
+      addUser(name, phone, pw, new Date().toLocaleString('ko-KR')),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('연결 시간 초과. 와이파이/데이터 확인 후 재시도해주세요.')), 30000))
+    ]);
+    document.getElementById('ss2').style.display='none';
+    document.getElementById('ssDone').style.display='block';
+    toast('✓ 저장됐어요.');
+  } catch(e) {
+    toast('오류: ' + e.message);
+    console.error('doSetPw error:', e);
+  }
 }
 
 // ══ PW REQUEST MODAL ══
@@ -1926,14 +1961,16 @@ async function confirmBooking(){
     name, phone, status: 'booked',
     bookedAt: now, changedAt: null, originalKey: null,
   };
-  // 통합 저장소에 바로 추가
-  const all = await getAdminBookings();
-  all.unshift(booking);
-  setAdminBookings(all);
-  closeBookingModal();
-  pendingShowKey = null;
-  updateBookingBadge();
-  toast('✓ 예매가 완료됐어요!');
+  try {
+    await addBooking(booking);
+    closeBookingModal();
+    pendingShowKey = null;
+    await updateBookingBadge();
+    toast('✓ 예매가 완료됐어요!');
+  } catch(e) {
+    toast('예매 중 오류가 발생했어요. 다시 시도해주세요.');
+    console.error('confirmBooking error:', e);
+  }
 }
 
 // ══ 예매 조회 ══
@@ -1998,10 +2035,9 @@ async function requestCancel(){
   const booking = await getBooking();
   if(!booking) return;
   openConfirm('예매 취소', `${SHOW_LABELS[booking.key]?.day} ${SHOW_LABELS[booking.key]?.time}\n이 예매를 취소하시겠어요?`, async()=>{
-    const all = await getAdminBookings();
-    const idx = all.findIndex(b=>b.id===booking.id);
-    if(idx>=0){ all[idx].status='cancelled'; all[idx].cancelledAt=new Date().toLocaleString('ko-KR'); }
-    setAdminBookings(all);
+    if(booking._key){
+      await updateBooking(booking._key, {status:'cancelled', cancelledAt:new Date().toLocaleString('ko-KR')});
+    }
     updateBookingBadge();
     renderChangeTicket();
     toast('예매가 취소됐어요.');
@@ -2030,15 +2066,14 @@ async function confirmChange(newKey){
   const booking = await getBooking();
   openConfirm('날짜 변경', `${s.day} ${s.time}으로\n변경하시겠어요?`, async()=>{
     if(!booking) return;
-    const all = await getAdminBookings();
-    const idx = all.findIndex(b=>b.id===booking.id);
-    if(idx>=0){
-      all[idx].originalKey = all[idx].originalKey || all[idx].key;
-      all[idx].key = newKey;
-      all[idx].status = 'changed';
-      all[idx].changedAt = new Date().toLocaleString('ko-KR');
+    if(booking._key){
+      await updateBooking(booking._key, {
+        originalKey: booking.originalKey || booking.key,
+        key: newKey,
+        status: 'changed',
+        changedAt: new Date().toLocaleString('ko-KR')
+      });
     }
-    setAdminBookings(all);
     updateBookingBadge();
     document.getElementById('changePanel').classList.remove('open');
     renderChangeTicket();
@@ -2152,7 +2187,7 @@ async function renderBookingsAdmin(){
 }
 async function deleteAdminBooking(id){
   openConfirm('예매 기록 삭제','이 예매 기록을 삭제할까요?',async()=>{
-    setAdminBookings((await getAdminBookings()).filter(b=>b.id!==id));
+    await deleteBookingByKey(id);
     renderBookingsAdmin(); updateBookingBadge(); renderStats(); toast('삭제됐어요.');
   });
 }
@@ -2202,6 +2237,5 @@ window.addEventListener('DOMContentLoaded', function(){
     }
   })();
 });
+
 </script>
-</body>
-</html>
