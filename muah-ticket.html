@@ -1480,6 +1480,7 @@ async function deleteBookingByKey(key){ await fbRemove('bookings/'+key); }
 
 async function getBookings(){
   const phone = getLoginPhone();
+  if(!phone) return [];
   const all = await getAdminBookings();
   return all.filter(b=>b.phone===phone);
 }
@@ -1630,11 +1631,11 @@ function goPage(page){
   } else if(page==='myticket'){
     document.getElementById('page-home').classList.remove('active');
     document.getElementById('page-myticket').classList.add('active');
-    renderMyTicket();
+    renderMyTicket().catch(e=>console.error(e));
   } else if(page==='change'){
     document.getElementById('page-home').classList.remove('active');
     document.getElementById('page-change').classList.add('active');
-    renderChangeTicket();
+    renderChangeTicket().catch(e=>console.error(e));
   }
 }
 function goHome(){
@@ -1737,7 +1738,12 @@ async function enterAdmin(){
     document.getElementById('ap-'+id).classList.toggle('active',id==='users');
     document.getElementById('tab-'+id).classList.toggle('active',id==='users');
   });
-  await renderStats(); await renderTable(); await renderReqs();
+  try {
+    await Promise.all([renderStats(), renderTable(), renderReqs()]);
+  } catch(e) {
+    console.error('enterAdmin error:', e);
+    toast('데이터를 불러오는 중 오류가 발생했어요.');
+  }
 }
 function adminLogout(){
   document.getElementById('page-admin').classList.remove('active');
@@ -1750,9 +1756,9 @@ function switchAdminTab(t){
     document.getElementById('ap-'+id).classList.toggle('active',id===t);
     document.getElementById('tab-'+id).classList.toggle('active',id===t);
   });
-  if(t==='reqs') renderReqs();
-  if(t==='content') loadContentEditor();
-  if(t==='bookings') renderBookingsAdmin();
+  if(t==='reqs') renderReqs().catch(e=>console.error(e));
+  if(t==='content') loadContentEditor().catch(e=>console.error(e));
+  if(t==='bookings') renderBookingsAdmin().catch(e=>console.error(e));
 }
 
 async function renderStats(){
@@ -1791,7 +1797,7 @@ async function toggleAllCb(el){
 async function renderTable(){
   const q=(document.getElementById('searchInp').value||'').trim().toLowerCase();
   const qNum=q.replace(/\D/g,'');
-  const [allUsers,allBookings]=await Promise.all([getUsers(),await getAdminBookings()]);
+  const [allUsers,allBookings]=await Promise.all([getUsers(),getAdminBookings()]);
   let users=allUsers;
   if(q) users=users.filter(u=>u.name.toLowerCase().includes(q)||u.phone.includes(q)||(qNum&&u.phone.replace(/\D/g,'').includes(qNum)));
   document.getElementById('statTotal').textContent=allUsers.length;
@@ -1975,9 +1981,15 @@ async function confirmBooking(){
 
 // ══ 예매 조회 ══
 async function renderMyTicket(){
-  const phone = sessionStorage.getItem('loginPhone') || localStorage.getItem('muah_loginPhone') || '';
-  const allBookings = (await getBookings()).filter(b => b.phone === phone);
   const el = document.getElementById('myTicketContent');
+  el.innerHTML = '<div class="no-ticket-msg"><div class="nt-icon">⏳</div>불러오는 중...</div>';
+  let allBookings = [];
+  try {
+    allBookings = await getBookings();
+  } catch(e) {
+    el.innerHTML = '<div class="no-ticket-msg">데이터를 불러오지 못했어요.<br>새로고침 해주세요.</div>';
+    return;
+  }
   if(!allBookings.length){
     el.innerHTML = `<div class="no-ticket-msg">
       <div class="nt-icon">🎫</div>
