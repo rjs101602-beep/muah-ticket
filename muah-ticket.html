@@ -1398,12 +1398,27 @@ tbody tr.selected td { background: #FFF5E6; }
 <div id="toast"></div>
 
 <script>
-const GAS_URL = "https://script.google.com/macros/s/AKfycbyDXl2GTD1Cky01-cD665P7b1N0Ocqmgi8ieo0SL9PFN1Vm0t9130xGyJYd-wAvOg-a3g/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxGFsXhfUxQS74jyxgLDcqt9Zyjnxsz9cUjYrTxfERdSiuwZOVhsXQMKfe79_htp1xy1g/exec";
 
 async function gasGet(sheet) {
   const res = await fetch(GAS_URL + "?action=get&sheet=" + sheet);
-  if(!res.ok) throw new Error("GAS GET failed: " + res.status);
-  return await res.json();
+  const text = await res.text();
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch(e) {
+    console.error("[gasGet] Invalid JSON response:", text.slice(0,300));
+    throw new Error("서버 응답 오류 (배포 설정을 확인해주세요)");
+  }
+  if(data && data.error) {
+    console.error("[gasGet] GAS error:", data.error);
+    throw new Error(data.error);
+  }
+  if(!Array.isArray(data)) {
+    console.error("[gasGet] Unexpected response:", data);
+    return [];
+  }
+  return data;
 }
 async function gasAdd(sheet, data) {
   const res = await fetch(GAS_URL + "?action=add&sheet=" + sheet + "&data=" + encodeURIComponent(JSON.stringify(data)));
