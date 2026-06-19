@@ -1398,74 +1398,52 @@ tbody tr.selected td { background: #FFF5E6; }
 <div id="toast"></div>
 
 <script>
-const FB_BASE = "https://muah-ticket-default-rtdb.asia-southeast1.firebasedatabase.app";
-async function fbGet(p){
-  try {
-    const res = await fetch(FB_BASE + "/" + p + ".json", {
-      method: "GET",
-      mode: "cors",
-      cache: "no-store"
-    });
-    if(!res.ok) throw new Error("HTTP " + res.status);
-    return await res.json();
-  } catch(e) {
-    console.error("[fbGet]", p, e.name, e.message);
-    throw new Error("네트워크 오류 (" + e.message + ")");
-  }
-}
-async function fbSet(p,v){
-  const res = await fetch(FB_BASE + "/" + p + ".json", {
-    method: "PUT",
-    body: JSON.stringify(v)
-  });
-  if(!res.ok) throw new Error("Firebase SET failed: " + res.status);
+const GAS_URL = "https://script.google.com/macros/s/AKfycbyDXl2GTD1Cky01-cD665P7b1N0Ocqmgi8ieo0SL9PFN1Vm0t9130xGyJYd-wAvOg-a3g/exec";
+
+async function gasGet(sheet) {
+  const res = await fetch(GAS_URL + "?action=get&sheet=" + sheet);
+  if(!res.ok) throw new Error("GAS GET failed: " + res.status);
   return await res.json();
 }
-async function fbPush(p,v){
-  const res = await fetch(FB_BASE + "/" + p + ".json", {
-    method: "POST",
-    body: JSON.stringify(v)
-  });
-  if(!res.ok) throw new Error("Firebase PUSH failed: " + res.status);
-  const data = await res.json();
-  return { key: data.name };
-}
-async function fbUpdate(p,v){
-  const res = await fetch(FB_BASE + "/" + p + ".json", {
-    method: "PATCH",
-    body: JSON.stringify(v)
-  });
-  if(!res.ok) throw new Error("Firebase UPDATE failed: " + res.status);
+async function gasAdd(sheet, data) {
+  const res = await fetch(GAS_URL + "?action=add&sheet=" + sheet + "&data=" + encodeURIComponent(JSON.stringify(data)));
+  if(!res.ok) throw new Error("GAS ADD failed: " + res.status);
   return await res.json();
 }
-async function fbRemove(p){
-  const res = await fetch(FB_BASE + "/" + p + ".json", {
-    method: "DELETE"
-  });
-  if(!res.ok) throw new Error("Firebase DELETE failed: " + res.status);
+async function gasUpdate(sheet, key, data) {
+  const res = await fetch(GAS_URL + "?action=update&sheet=" + sheet + "&key=" + encodeURIComponent(key) + "&data=" + encodeURIComponent(JSON.stringify(data)));
+  if(!res.ok) throw new Error("GAS UPDATE failed: " + res.status);
   return await res.json();
 }
-function objToArr(o){ if(!o) return []; if(Array.isArray(o)) return o; return Object.entries(o).map(([k,v])=>({...v,_key:k})); }
+async function gasDelete(sheet, key) {
+  const res = await fetch(GAS_URL + "?action=delete&sheet=" + sheet + "&key=" + encodeURIComponent(key));
+  if(!res.ok) throw new Error("GAS DELETE failed: " + res.status);
+  return await res.json();
+}
+async function gasSetContent(data) {
+  const res = await fetch(GAS_URL + "?action=setContent&data=" + encodeURIComponent(JSON.stringify(data)));
+  if(!res.ok) throw new Error("GAS SETCONTENT failed: " + res.status);
+  return await res.json();
+}
+async function gasGetContent() {
+  const res = await fetch(GAS_URL + "?action=getContent");
+  if(!res.ok) throw new Error("GAS GETCONTENT failed: " + res.status);
+  return await res.json();
+}
 
 // ══ STORAGE ══
 const ADMIN_PW = '@@mingi215';
 
 // ── 사용자 ──
 async function getUsers(){
-  const d = await fbGet('users');
-  return objToArr(d);
+  return await gasGet('users');
 }
-async function saveUser(user){
-  if(user._key){ await fbUpdate('users/'+user._key, user); }
-  else { await fbPush('users', user); }
-}
-async function deleteUser(key){ await fbRemove('users/'+key); }
-async function deleteUsers(keys){ for(const k of keys) await fbRemove('users/'+k); }
+async function deleteUser(key){ await gasDelete('users', key); }
 
 async function addUser(name, phone, pw, createdAt){
   const users = await getUsers();
   if(users.find(u=>u.name===name&&u.phone===phone)) return false;
-  await fbPush('users', {name,phone,pw,createdAt});
+  await gasAdd('users', {name,phone,pw,createdAt});
   return true;
 }
 async function findUser(name, phone, pw){
@@ -1475,15 +1453,22 @@ async function findUser(name, phone, pw){
 
 // ── 예매 ──
 async function getAdminBookings(){
-  const d = await fbGet('bookings');
-  return objToArr(d);
+  const list = await gasGet('bookings');
+  // rowKey: 시트 행 식별자(고유), key: 공연 회차 식별자(SHOW_LABELS)
+  return list.map(b => ({...b, rowKey: b.key, key: b.showKey}));
 }
 async function addBooking(booking){
-  const ref = await fbPush('bookings', booking);
-  return ref.key;
+  const payload = {...booking, showKey: booking.key};
+  delete payload.key;
+  const res = await gasAdd('bookings', payload);
+  return res.key;
 }
-async function updateBooking(key, data){ await fbUpdate('bookings/'+key, data); }
-async function deleteBookingByKey(key){ await fbRemove('bookings/'+key); }
+async function updateBooking(rowKey, data){
+  const payload = {...data};
+  if(payload.key){ payload.showKey = payload.key; delete payload.key; }
+  await gasUpdate('bookings', rowKey, payload);
+}
+async function deleteBookingByKey(rowKey){ await gasDelete('bookings', rowKey); }
 
 async function getBookings(){
   const phone = getLoginPhone();
@@ -1499,18 +1484,17 @@ async function getBooking(){
 
 // ── 비밀번호 요청 ──
 async function getReqs(){
-  const d = await fbGet('pwreqs');
-  return objToArr(d);
+  return await gasGet('pwreqs');
 }
 async function addReq(name,phone){
-  await fbPush('pwreqs',{name,phone,time:new Date().toLocaleString('ko-KR'),done:false});
+  await gasAdd('pwreqs', {name,phone,time:new Date().toLocaleString('ko-KR'),done:false});
 }
-async function updateReq(key,data){ await fbUpdate('pwreqs/'+key,data); }
-async function deleteReq(key){ await fbRemove('pwreqs/'+key); }
+async function updateReq(key,data){ await gasUpdate('pwreqs', key, data); }
+async function deleteReq(key){ await gasDelete('pwreqs', key); }
 
 // ── 공연 콘텐츠 ──
-async function getContent(){ const d=await fbGet('content'); return d||{}; }
-async function setContent(data){ await fbSet('content',data); }
+async function getContent(){ return await gasGetContent() || {}; }
+async function setContent(data){ await gasSetContent(data); }
 
 // ── 로그인 정보 (로컬만) ──
 function getLoginName(){ return sessionStorage.getItem('loginName')||localStorage.getItem('muah_loginName')||''; }
@@ -1793,7 +1777,7 @@ function updateSelBtn(){
 }
 async function toggleAllCb(el){
   const users=await getUsers();
-  if(el.checked) users.forEach(u=>selectedIds.add(u._key));
+  if(el.checked) users.forEach(u=>selectedIds.add(u.key));
   else selectedIds.clear();
   updateSelBtn(); renderTable();
 }
@@ -1805,17 +1789,17 @@ async function renderTable(){
   if(q) users=users.filter(u=>u.name.toLowerCase().includes(q)||u.phone.includes(q)||(qNum&&u.phone.replace(/\D/g,'').includes(qNum)));
   document.getElementById('statTotal').textContent=allUsers.length;
   const cbAll=document.getElementById('cbAll');
-  if(cbAll) cbAll.checked=users.length>0&&users.every(u=>selectedIds.has(u._key));
+  if(cbAll) cbAll.checked=users.length>0&&users.every(u=>selectedIds.has(u.key));
   const tb=document.getElementById('aTbody');
   const bpMap={};
   allBookings.forEach(b=>{if(!bpMap[b.phone])bpMap[b.phone]=[];bpMap[b.phone].push(b);});
   if(!users.length){tb.innerHTML='<tr><td colspan="7" class="empty-td">등록된 계정이 없어요.</td></tr>';return;}
   tb.innerHTML=users.map((u,i)=>{
-    const chk=selectedIds.has(u._key);
+    const chk=selectedIds.has(u.key);
     const ubks=(bpMap[u.phone]||[]).filter(b=>b.status!=='cancelled');
     const bkCell=ubks.length?ubks.map(b=>{const s=SHOW_LABELS[b.key]||{day:'',time:''};const badge=b.status==='changed'?'<span style="font-size:10px;color:#7A6A30;background:#FFF8D6;padding:1px 5px;border-radius:8px;margin-left:3px;">변경</span>':'';return `<div style="font-size:11.5px;color:#5A4E3A;line-height:1.5;">${s.day} ${s.time}${badge}</div>`;}).join(''):'<span style="font-size:11px;color:#C8BFB0;">예매 없음</span>';
-    if(editId===u._key) return `<tr class="${chk?'selected':''}"><td><input type="checkbox" class="a-cb row-cb" ${chk?'checked':''} onchange="toggleCb('${u._key}',this)"></td><td>${i+1}</td><td><input class="td-input" id="e-name" value="${u.name.replace(/"/g,'&quot;')}" style="width:80px"></td><td><input class="td-input" id="e-phone" value="${u.phone}" style="width:130px"></td><td>${bkCell}</td><td class="td-date">${u.createdAt||''}</td><td><button class="btn-t-save" onclick="saveEdit('${u._key}')">저장</button><button class="btn-t-cancel" onclick="cancelEdit()">취소</button></td></tr>`;
-    return `<tr class="${chk?'selected':''}"><td><input type="checkbox" class="a-cb row-cb" ${chk?'checked':''} onchange="toggleCb('${u._key}',this)"></td><td>${i+1}</td><td class="td-name">${u.name}</td><td class="td-phone">${u.phone}</td><td>${bkCell}</td><td class="td-date">${u.createdAt||''}</td><td><button class="btn-t-edit" onclick="startEdit('${u._key}')">수정</button><button class="btn-t-del" onclick="confirmDel('${u._key}','${u.name.replace(/'/g,"\\'")}')">삭제</button></td></tr>`;
+    if(editId===u.key) return `<tr class="${chk?'selected':''}"><td><input type="checkbox" class="a-cb row-cb" ${chk?'checked':''} onchange="toggleCb('${u.key}',this)"></td><td>${i+1}</td><td><input class="td-input" id="e-name" value="${u.name.replace(/"/g,'&quot;')}" style="width:80px"></td><td><input class="td-input" id="e-phone" value="${u.phone}" style="width:130px"></td><td>${bkCell}</td><td class="td-date">${u.createdAt||''}</td><td><button class="btn-t-save" onclick="saveEdit('${u.key}')">저장</button><button class="btn-t-cancel" onclick="cancelEdit()">취소</button></td></tr>`;
+    return `<tr class="${chk?'selected':''}"><td><input type="checkbox" class="a-cb row-cb" ${chk?'checked':''} onchange="toggleCb('${u.key}',this)"></td><td>${i+1}</td><td class="td-name">${u.name}</td><td class="td-phone">${u.phone}</td><td>${bkCell}</td><td class="td-date">${u.createdAt||''}</td><td><button class="btn-t-edit" onclick="startEdit('${u.key}')">수정</button><button class="btn-t-del" onclick="confirmDel('${u.key}','${u.name.replace(/'/g,"\\'")}')">삭제</button></td></tr>`;
   }).join('');
 }
 function toggleCb(key,el){
@@ -2050,8 +2034,8 @@ async function requestCancel(){
   const booking = await getBooking();
   if(!booking) return;
   openConfirm('예매 취소', `${SHOW_LABELS[booking.key]?.day} ${SHOW_LABELS[booking.key]?.time}\n이 예매를 취소하시겠어요?`, async()=>{
-    if(booking._key){
-      await updateBooking(booking._key, {status:'cancelled', cancelledAt:new Date().toLocaleString('ko-KR')});
+    if(booking.rowKey){
+      await updateBooking(booking.rowKey, {status:'cancelled', cancelledAt:new Date().toLocaleString('ko-KR')});
     }
     updateBookingBadge();
     renderChangeTicket();
@@ -2081,8 +2065,8 @@ async function confirmChange(newKey){
   const booking = await getBooking();
   openConfirm('날짜 변경', `${s.day} ${s.time}으로\n변경하시겠어요?`, async()=>{
     if(!booking) return;
-    if(booking._key){
-      await updateBooking(booking._key, {
+    if(booking.rowKey){
+      await updateBooking(booking.rowKey, {
         originalKey: booking.originalKey || booking.key,
         key: newKey,
         status: 'changed',
@@ -2195,7 +2179,7 @@ async function renderBookingsAdmin(){
       ${origS?`<div class="a-booking-meta">원래 예매: ${origS.day} ${origS.time}</div>`:''}
       <div class="a-booking-meta">예매: ${b.bookedAt||''}${b.changedAt?' · 변경: '+b.changedAt:''}${b.cancelledAt?' · 취소: '+b.cancelledAt:''}</div>
       <div class="a-booking-actions">
-        <button class="btn-ab-del" onclick="deleteAdminBooking('${b._key}')">기록 삭제</button>
+        <button class="btn-ab-del" onclick="deleteAdminBooking('${b.rowKey}')">기록 삭제</button>
       </div>
     </div>`;
   }).join('');
