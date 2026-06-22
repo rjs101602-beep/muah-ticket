@@ -732,6 +732,8 @@ function submitBooking(){
   };
 
   toast('예매 처리 중...');
+  console.log('[submitBooking] GAS_URL:', GAS_URL);
+  console.log('[submitBooking] bookingData:', bookingData);
 
   // ── 진짜 form 제출 방식 (가장 안정적, CORS 영향 없음) ──
   // 1) 숨겨진 타겟 iframe 준비
@@ -757,7 +759,10 @@ function submitBooking(){
   form.appendChild(input);
 
   document.body.appendChild(form);
+  console.log('[submitBooking] form action:', form.action);
+  console.log('[submitBooking] form data value:', input.value);
   form.submit();
+  console.log('[submitBooking] form.submit() 호출 완료');
   document.body.removeChild(form);
 
   // 전송 후 완료 화면으로 전환 (form 제출은 응답 확인이 안 되므로 약간 대기)
