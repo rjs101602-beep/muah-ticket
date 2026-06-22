@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MUAH TICKET</title>
-
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
 
@@ -129,8 +128,8 @@ body {
 }
 input[type="text"], input[type="tel"], input[type="password"] {
   width: 100%; background: #fff; border: 1px solid var(--border);
-  border-radius: 2px; padding: 11px 13px; color: var(--ink);
-  font-family: 'Noto Sans KR', sans-serif; font-size: 15px; outline: none;
+  border-radius: 2px; padding: 13px 13px; color: var(--ink);
+  font-family: 'Noto Sans KR', sans-serif; font-size: 16px; outline: none;
   transition: border-color .2s, box-shadow .2s;
 }
 input:focus { border-color: var(--brown-lt); box-shadow: 0 0 0 3px var(--brown-dim); }
@@ -139,10 +138,10 @@ input:disabled { background: var(--card2); color: var(--muted); cursor: not-allo
 
 /* PIN */
 .pin-display {
-  display: flex; gap: 7px; cursor: text; margin-bottom: 5px; width: 100%;
+  display: flex; gap: 8px; cursor: text; margin-bottom: 5px;
 }
 .pin-box {
-  flex: 1; height: 52px; border: 1px solid var(--border);
+  width: 44px; height: 52px; border: 1px solid var(--border);
   border-radius: 3px; background: #fff;
   display: flex; align-items: center; justify-content: center;
   font-size: 22px; font-weight: 700; color: var(--ink);
@@ -162,10 +161,11 @@ input:disabled { background: var(--card2); color: var(--muted); cursor: not-allo
 .step-lbl { font-size: 10px; color: var(--muted); white-space: nowrap; }
 
 .btn-main {
-  width: 100%; padding: 13px; background: var(--brown); border: none; border-radius: 2px;
+  width: 100%; padding: 15px; background: var(--brown); border: none; border-radius: 2px;
   color: #FDFAF5; font-family: 'Noto Sans KR', sans-serif;
-  font-size: 14px; font-weight: 700; cursor: pointer;
-  margin-top: 8px; letter-spacing: 1.5px; transition: all .2s;
+  font-size: 15px; font-weight: 700; cursor: pointer;
+  margin-top: 8px; letter-spacing: 1px; transition: all .2s;
+  min-height: 48px;
 }
 .btn-main:hover { background: var(--ink); }
 .btn-main:active { transform: scale(.99); }
@@ -185,84 +185,105 @@ input:disabled { background: var(--card2); color: var(--muted); cursor: not-allo
 }
 .success-view p { color: var(--muted); font-size: 12.5px; line-height: 1.8; }
 
-/* ── HOME SCREEN ── */
-#page-home {
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  padding: 48px 16px 80px;
-  background: var(--bg);
+/* ══════════════════════════════
+   MODALS
+══════════════════════════════ */
+.modal-bg {
+  display: none; position: fixed; inset: 0;
+  background: rgba(36,28,14,.5); z-index: 300;
+  align-items: flex-start; justify-content: center; padding: 20px;
+  backdrop-filter: blur(2px);
+  overflow-y: auto;
 }
-#page-home.active { display: flex; }
-
-.home-header { text-align: center; margin-bottom: 10px; }
-.home-welcome {
-  font-size: 13px; color: var(--muted);
-  letter-spacing: .5px; margin-bottom: 32px; text-align: center;
-}
-.home-welcome strong { color: var(--brown); font-weight: 700; }
-
-.home-card {
+.modal-bg.open { display: flex; }
+.modal {
   background: var(--card); border: 1px solid var(--border);
-  width: 100%; max-width: 420px;
-  position: relative;
-  box-shadow: 0 2px 0 var(--border2), 0 8px 32px rgba(60,40,10,.11);
+  border-radius: 4px; width: 100%; max-width: 360px;
+  padding: 26px 22px 20px; position: relative;
+  box-shadow: 0 12px 40px rgba(36,28,14,.2);
+  animation: slideUp .22s ease;
+  margin: 40px 0;
 }
-.home-card::before {
+@keyframes slideUp { from{transform:translateY(14px);opacity:0} to{transform:translateY(0);opacity:1} }
+.modal::before {
   content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-  background: linear-gradient(90deg, transparent, var(--brown-lt) 30%, var(--brown) 50%, var(--brown-lt) 70%, transparent);
+  background: linear-gradient(90deg, transparent, var(--brown-lt) 40%, var(--brown) 50%, var(--brown-lt) 60%, transparent);
 }
-.home-card-body { padding: 28px 28px 32px; }
-.home-card-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 15px; letter-spacing: 2px; color: var(--muted);
-  text-transform: uppercase; margin-bottom: 20px; text-align: center;
-}
-
-.home-btn-grid { display: flex; flex-direction: column; gap: 12px; }
-
-.home-btn {
-  display: flex; align-items: center; gap: 16px;
-  padding: 18px 20px;
-  background: var(--card2); border: 1px solid var(--border);
-  border-radius: 3px; cursor: pointer;
-  transition: all .2s; text-align: left; width: 100%;
+.modal-title {
   font-family: 'Noto Sans KR', sans-serif;
+  font-size: 17px; font-weight: 700; color: var(--ink);
+  margin-bottom: 12px; letter-spacing: .2px;
+  padding-bottom: 8px; border-bottom: 1px solid var(--border);
 }
-.home-btn:hover {
-  background: #FFF5E6; border-color: var(--brown-lt);
-  box-shadow: 0 2px 12px rgba(122,92,56,.1);
-  transform: translateY(-1px);
+.modal-sub { font-size: 12px; color: var(--muted); line-height: 1.7; margin-bottom: 18px; }
+.modal-close {
+  position: absolute; top: 12px; right: 14px;
+  background: none; border: none; font-size: 20px; color: var(--muted); cursor: pointer;
 }
-.home-btn:active { transform: scale(.99); }
+.modal-sent { display: none; text-align: center; padding: 4px 0; }
+.modal-sent-icon { font-size: 28px; margin-bottom: 8px; }
+.modal-sent p { font-size: 12.5px; color: var(--muted); line-height: 1.8; }
 
-.home-btn-icon {
-  width: 44px; height: 44px; border-radius: 50%;
-  background: var(--card); border: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 20px; flex-shrink: 0;
-  transition: border-color .2s;
+/* CONFIRM */
+.confirm-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.65); z-index: 600;
+  align-items: center; justify-content: center; padding: 20px;
 }
-.home-btn:hover .home-btn-icon { border-color: var(--brown-lt); }
+.confirm-overlay.open { display: flex; }
+.confirm-box {
+  background: #1A1610; border: 1px solid #3A3228;
+  border-radius: 4px; padding: 28px 24px 22px;
+  width: 100%; max-width: 300px; text-align: center;
+  animation: slideUp .2s ease;
+}
+.confirm-box h3 { font-size: 16px; color: #F0EBE2; margin-bottom: 8px; }
+.confirm-box p { font-size: 12.5px; color: #706A5E; line-height: 1.7; margin-bottom: 20px; }
+.confirm-btns { display: flex; gap: 10px; }
+.c-cancel {
+  flex: 1; padding: 10px; background: none;
+  border: 1px solid #2E2E3A; border-radius: 3px; color: #706A5E;
+  font-family: 'Noto Sans KR', sans-serif; font-size: 13px; cursor: pointer; transition: all .2s;
+}
+.c-cancel:hover { border-color: #C9A96E; color: #C9A96E; }
+.c-ok {
+  flex: 1; padding: 10px; background: #C0614A; border: none; border-radius: 3px;
+  color: #fff; font-family: 'Noto Sans KR', sans-serif; font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: filter .2s;
+}
+.c-ok:hover { filter: brightness(1.1); }
 
-.home-btn-text { flex: 1; }
-.home-btn-label {
-  font-size: 15px; font-weight: 700; color: var(--ink);
-  margin-bottom: 3px; letter-spacing: .2px;
+/* TOAST */
+#toast {
+  position: fixed; bottom: 28px; left: 50%;
+  transform: translateX(-50%) translateY(12px);
+  background: #241C0E; border-radius: 2px;
+  padding: 10px 20px; font-size: 13px; color: #FDFAF5;
+  opacity: 0; pointer-events: none; white-space: nowrap;
+  transition: all .25s; z-index: 9999;
 }
-.home-btn-desc { font-size: 11.5px; color: var(--muted); line-height: 1.4; }
-.home-btn-arrow { font-size: 16px; color: var(--muted2); flex-shrink: 0; transition: color .2s; }
-.home-btn:hover .home-btn-arrow { color: var(--brown-lt); }
+#toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
-.home-logout {
-  margin-top: 22px;
-  background: none; border: none; color: var(--muted);
-  font-family: 'Noto Sans KR', sans-serif; font-size: 12px; cursor: pointer;
-  text-decoration: underline; text-underline-offset: 3px; transition: color .2s;
+@media(max-width:480px){
+  .ticket-body{padding:22px 16px 18px;}
+  .ticket-stub{padding:12px 16px 16px;}
+  .modal{padding:22px 18px 18px;}
+  .booking-slide{padding:20px 16px;}
+  .show-date-btn{padding:15px 16px;}
 }
-.home-logout:hover { color: var(--ink); }
+@media(max-width:360px){
+  .logo{font-size:32px; letter-spacing:8px;}
+  .ticket-body{padding:18px 14px 16px;}
+  .booking-slide{padding:16px 14px;}
+  .s-title{font-size:19px !important;}
+  .modal{padding:20px 14px 16px;}
+}
+/* ══ 페이지 전환 ══ */
+#page-home {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 100vh; padding: 48px 16px 80px;
+}
+#page-home.hidden { display: none; }
 
 /* ══════════════════════════════
    BOOKING PAGE
@@ -350,11 +371,12 @@ input:disabled { background: var(--card2); color: var(--muted); cursor: not-allo
 /* 공연 예매 — 날짜 선택 */
 .show-select-title {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 20px; font-weight: 600; text-align: center;
-  margin-bottom: 6px; color: var(--ink);
+  font-size: 18px; font-weight: 600; color: var(--ink);
+  margin-bottom: 12px; letter-spacing: .5px;
+  padding-bottom: 8px; border-bottom: 1px solid var(--border);
 }
 .show-select-sub {
-  font-size: 12.5px; color: var(--muted); text-align: center;
+  font-size: 12.5px; color: var(--muted);
   margin-bottom: 24px; line-height: 1.6;
 }
 .show-date-grid { display: flex; flex-direction: column; gap: 12px; }
@@ -371,531 +393,50 @@ input:disabled { background: var(--card2); color: var(--muted); cursor: not-allo
   box-shadow: 0 3px 12px rgba(122,92,56,.12); transform: translateY(-1px);
 }
 .show-date-btn:active { transform: scale(.99); }
-.show-date-btn.sold-out { opacity: .5; cursor: not-allowed; background: var(--card2); }
-.show-date-btn.sold-out:hover { transform: none; border-color: var(--border); background: var(--card2); box-shadow: none; }
-.sdb-day { font-size: 13px; color: var(--ink2); margin-bottom: 5px; letter-spacing: .2px; font-family:'Noto Sans KR',sans-serif; font-weight:500; }
-.sdb-time { font-size: 20px; font-weight: 700; color: var(--ink); font-family: 'Noto Sans KR', sans-serif; letter-spacing: 0; }
+.show-date-btn.selected { border-color: var(--brown); background: var(--brown-dim); }
+.sdb-day { font-size: 12px; color: var(--muted); margin-bottom: 4px; letter-spacing: .3px; }
+.sdb-time { font-size: 17px; font-weight: 700; color: var(--brown); font-family: 'Noto Sans KR', sans-serif; letter-spacing: .3px; }
 .sdb-tag {
   font-size: 11px; padding: 4px 10px;
   background: var(--brown-dim); color: var(--brown);
   border-radius: 20px; font-weight: 500; flex-shrink: 0;
 }
-.sdb-tag.sold { background: #F0E8E6; color: #B84C3A; }
 
-/* ══════════════════════════════
-   ADMIN 콘텐츠 관리 패널
-══════════════════════════════ */
-.content-edit-section { margin-bottom: 28px; }
-.ce-title {
-  font-size: 14px; font-weight: 700; color: var(--ink);
-  margin-bottom: 10px; padding-bottom: 8px;
-  border-bottom: 1px solid #E2D9CC;
+/* 변경·취소 안내 */
+.change-notice {
+  margin-top: 22px; padding: 16px 18px;
+  background: var(--card2); border: 1px solid var(--border);
+  border-left: 3px solid var(--brown-lt); border-radius: 3px;
+  font-size: 12.5px; color: var(--ink2); line-height: 1.7;
+  text-align: center;
 }
-.ce-label { font-size: 11px; color: #9A8E7A; font-weight: 500; letter-spacing: .5px; text-transform: uppercase; margin-bottom: 5px; display: block; }
-.ce-textarea {
-  width: 100%; background: #fff; border: 1px solid #DDD5C4;
-  border-radius: 3px; padding: 11px 13px; color: #2C2416;
-  font-family: 'Noto Sans KR', sans-serif; font-size: 13.5px;
-  line-height: 1.8; outline: none; resize: vertical; min-height: 140px;
-  transition: border-color .2s;
+.change-notice strong { color: var(--brown); }
+.change-notice-sub { font-size: 11px; color: var(--muted); margin-top: 3px; margin-bottom: 12px; }
+.change-notice-row {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  font-size: 12px; color: var(--ink2); margin-bottom: 6px;
 }
-.ce-textarea:focus { border-color: #A67C52; box-shadow: 0 0 0 3px rgba(122,92,56,.08); }
-.ce-img-row { display: flex; align-items: center; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
-.ce-img-preview {
-  width: 80px; height: 120px; border-radius: 3px; overflow: hidden;
-  border: 1px solid #DDD5C4; flex-shrink: 0;
+.change-notice-row span {
+  font-size: 10.5px; font-weight: 700; color: var(--brown);
+  background: var(--brown-dim); padding: 2px 8px; border-radius: 10px; flex-shrink: 0;
 }
-.ce-img-preview img { width: 100%; height: 100%; object-fit: cover; }
-.ce-img-empty {
-  width: 80px; height: 120px; border: 2px dashed #DDD5C4; border-radius: 3px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 11px; color: #B0A090; text-align: center; flex-shrink: 0;
-}
-.ce-upload-btn {
-  padding: 9px 16px; background: #fff; border: 1px solid #DDD5C4;
-  border-radius: 3px; color: #5A4E3A; font-family: 'Noto Sans KR', sans-serif;
-  font-size: 12px; cursor: pointer; transition: all .2s;
-}
-.ce-upload-btn:hover { border-color: #A67C52; color: #7A5C38; background: #FFF8EF; }
-.btn-ce-save {
-  padding: 11px 20px; background: #7A5C38; border: none; border-radius: 3px;
-  color: #FDFAF5; font-family: 'Noto Sans KR', sans-serif;
-  font-size: 13px; font-weight: 700; cursor: pointer; letter-spacing: 1px; transition: all .2s;
-}
-.btn-ce-save:hover { background: #241C0E; }
+.change-notice-phone { margin-top: 12px; font-size: 13px; color: var(--ink); }
 
-/* ══════════════════════════════
-   예매 확인 모달
-══════════════════════════════ */
-.booking-confirm-modal {
-  display: none; position: fixed; inset: 0;
-  background: rgba(36,28,14,.5); z-index: 400;
-  align-items: flex-end; justify-content: center;
-  backdrop-filter: blur(2px);
-}
-.booking-confirm-modal.open { display: flex; }
-.bcm-sheet {
-  background: var(--card); border-radius: 16px 16px 0 0;
-  width: 100%; max-width: 480px; padding: 28px 24px 36px;
-  animation: sheetUp .3s cubic-bezier(.4,0,.2,1);
-}
-@keyframes sheetUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
-.bcm-handle { width: 40px; height: 4px; background: var(--border2); border-radius: 2px; margin: 0 auto 20px; }
-.bcm-title { font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:600; margin-bottom:4px; }
-.bcm-sub { font-size:12px; color:var(--muted); margin-bottom:18px; }
-.bcm-selected {
-  background: var(--card2); border: 1.5px solid var(--brown-lt);
-  border-radius: 6px; padding: 18px 20px; margin-bottom: 20px;
-}
-.bcm-sel-day { font-size:12px; color:var(--muted); margin-bottom:6px; letter-spacing:.5px; }
-.bcm-sel-time { font-size:26px; font-weight:700; color:var(--brown); font-family:'Cormorant Garamond',serif; letter-spacing:1px; }
-.bcm-user-info { font-size:12px; color:var(--muted); margin-bottom:20px; line-height:1.7; }
-.bcm-user-info strong { color:var(--ink); }
-.bcm-btns { display:flex; gap:10px; }
-.bcm-cancel-btn {
-  flex:1; padding:13px; background:#fff; border:1px solid var(--border);
-  border-radius:3px; color:var(--muted);
-  font-family:'Noto Sans KR',sans-serif; font-size:14px; cursor:pointer; transition:all .2s;
-}
-.bcm-cancel-btn:hover { border-color:var(--brown-lt); color:var(--ink); }
-.bcm-ok-btn {
-  flex:2; padding:13px; background:var(--brown); border:none;
-  border-radius:3px; color:#FDFAF5;
-  font-family:'Noto Sans KR',sans-serif; font-size:14px; font-weight:700;
-  cursor:pointer; letter-spacing:1px; transition:all .2s;
-}
-.bcm-ok-btn:hover { background:var(--ink); }
+/* 필수/선택 마크 */
+.req-mark { font-size: 10px; color: var(--danger); font-weight: 600; text-transform: none; letter-spacing: 0; }
+.opt-mark { font-size: 10px; color: var(--muted); font-weight: 400; text-transform: none; letter-spacing: 0; }
 
-/* ══════════════════════════════
-   예매 조회 / 취소·변경 페이지
-══════════════════════════════ */
-.booking-status-page {
-  display: none; min-height: 100vh; background: var(--bg); padding: 0 0 80px;
-}
-.booking-status-page.active { display: block; }
-
-.my-ticket-card {
-  background: var(--card); border: 1px solid var(--border);
-  margin: 20px; border-radius: 4px; overflow: hidden;
-  box-shadow: 0 2px 0 var(--border2), 0 4px 16px rgba(60,40,10,.08);
-}
-.my-ticket-card::before {
-  content:''; display:block; height:3px;
-  background: linear-gradient(90deg, transparent, var(--brown-lt) 30%, var(--brown) 50%, var(--brown-lt) 70%, transparent);
-}
-.mtc-body { padding: 20px; }
-.mtc-eyebrow { font-size:10px; letter-spacing:2.5px; color:var(--brown-lt); text-transform:uppercase; margin-bottom:12px; }
-.mtc-row { display:flex; justify-content:space-between; align-items:flex-start; padding:9px 0; border-bottom:1px solid var(--border); font-size:13px; }
-.mtc-row:last-of-type { border-bottom:none; }
-.mtc-key { color:var(--muted); font-size:11px; letter-spacing:.5px; padding-top:1px; }
-.mtc-val { font-weight:600; text-align:right; color:var(--ink); }
-.mtc-val.accent { color:var(--brown); font-family:'Cormorant Garamond',serif; font-size:17px; font-weight:600; }
-.mtc-val.badge-change { color:#7A6A30; font-size:11px; background:#FFF8D6; padding:2px 8px; border-radius:10px; border:1px solid #D4C060; }
-
-.status-action-btns { display:flex; gap:10px; padding:0 20px 20px; }
-.btn-ticket-cancel {
-  flex:1; padding:13px; background:#fff; border:1px solid var(--danger);
-  border-radius:3px; color:var(--danger);
-  font-family:'Noto Sans KR',sans-serif; font-size:14px; font-weight:500;
-  cursor:pointer; transition:all .2s;
-}
-.btn-ticket-cancel:hover { background:#FFF0ED; }
-.btn-ticket-change {
-  flex:1; padding:13px; background:var(--brown); border:none;
-  border-radius:3px; color:#FDFAF5;
-  font-family:'Noto Sans KR',sans-serif; font-size:14px; font-weight:700;
-  cursor:pointer; letter-spacing:.5px; transition:all .2s;
-}
-.btn-ticket-change:hover { background:var(--ink); }
-
-.no-ticket-msg { text-align:center; padding:60px 20px; color:var(--muted); font-size:14px; line-height:1.8; }
-.no-ticket-msg .nt-icon { font-size:40px; margin-bottom:12px; }
-
-/* 변경 날짜 선택 패널 */
-.change-panel { padding: 0 20px 20px; display:none; }
-.change-panel.open { display:block; }
-.change-panel-title { font-size:13px; font-weight:600; color:var(--ink2); margin-bottom:12px; padding-top:4px; }
-
-/* admin 예매 관리 탭 */
-.a-booking-card {
-  background:#fff; border:1px solid #E2D9CC; border-radius:4px;
-  padding:16px 18px; margin-bottom:10px;
-  box-shadow: 0 1px 4px rgba(60,40,10,.05);
-  animation: fadeIn .2s ease;
-}
-.a-booking-header { display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px; margin-bottom:10px; }
-.a-booking-name { font-size:15px; font-weight:700; color:#2C2416; font-family:'Noto Sans KR',sans-serif; }
-.a-booking-phone { font-size:12px; color:#9A8E7A; margin-top:2px; }
-.a-booking-time { font-family:'Cormorant Garamond',serif; font-size:20px; color:#7A5C38; font-weight:600; letter-spacing:.5px; margin:6px 0 2px; }
-.a-booking-meta { font-size:11px; color:#9A8E7A; margin-top:3px; }
-.a-booking-status {
-  font-size:11px; padding:3px 9px; border-radius:10px; font-weight:500;
-}
-.status-booked { background:#EEF5E8; color:#3A7A58; border:1px solid #AADBA8; }
-.status-changed { background:#FFF8D6; color:#7A6A30; border:1px solid #D4C060; }
-.status-cancelled { background:#FFF0ED; color:#B84C3A; border:1px solid #EDBBAF; }
-.a-booking-actions { display:flex; gap:6px; flex-wrap:wrap; margin-top:10px; }
-.btn-ab-del {
-  padding:5px 12px; background:#fff; border:1px solid #DDD5C4; border-radius:3px;
-  color:#9A8E7A; font-family:'Noto Sans KR',sans-serif; font-size:11px; cursor:pointer; transition:all .2s;
-}
-.btn-ab-del:hover { border-color:#D4826A; color:#B84C3A; background:#FFF0ED; }
-.booking-empty { text-align:center; color:#B0A090; font-size:13px; padding:36px; background:#fff; border:1px solid #E2D9CC; border-radius:4px; }
-
-/* ── 숨겨진 관리자 버튼 ── */
-.admin-trigger {
-  position: fixed; bottom: 18px; right: 20px;
-  width: 28px; height: 28px;
-  background: none; border: none; cursor: pointer;
-  opacity: 0.18; transition: opacity .2s;
-  z-index: 50;
-}
-.admin-trigger:hover { opacity: 0.45; }
-.admin-trigger-dot {
-  width: 100%; height: 100%; border-radius: 50%;
-  background: var(--ink2);
-}
-
-/* ══════════════════════════════
-   ADMIN LOCK OVERLAY
-══════════════════════════════ */
-.admin-lock-overlay {
-  display: none; position: fixed; inset: 0;
-  background: rgba(60,40,10,.4); z-index: 500;
-  align-items: center; justify-content: center; padding: 20px;
-  backdrop-filter: blur(6px);
-}
-.admin-lock-overlay.open { display: flex; }
-.lock-box {
-  background: #fff; border: 1px solid #E2D9CC;
-  border-radius: 6px; padding: 36px 32px 28px;
-  width: 100%; max-width: 320px; text-align: center;
-  position: relative;
-  box-shadow: 0 20px 60px rgba(60,40,10,.18);
-  animation: slideUp .22s ease;
-}
-.lock-box::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-  border-radius: 6px 6px 0 0;
-  background: linear-gradient(90deg, transparent, #A67C52 30%, #7A5C38 50%, #A67C52 70%, transparent);
-}
-.lock-icon { font-size: 28px; margin-bottom: 12px; }
-.lock-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 22px; letter-spacing: 4px; color: #7A5C38; margin-bottom: 4px;
-}
-.lock-sub { font-size: 11.5px; color: #9A8E7A; margin-bottom: 22px; letter-spacing: .3px; }
-.lock-pin-row { display: flex; gap: 8px; justify-content: center; margin-bottom: 6px; }
-.lock-pin-box {
-  width: 52px; height: 58px; background: #FAF7F2;
-  border: 1.5px solid #DDD5C4;
-  border-radius: 4px; display: flex; align-items: center; justify-content: center;
-  font-size: 24px; font-weight: 700; color: #7A5C38; transition: all .15s;
-}
-.lock-pin-box.filled { border-color: #A67C52; background: #FFF5E6; }
-.lock-pin-box.cur { border-color: #7A5C38; box-shadow: 0 0 0 3px rgba(122,92,56,.12); }
-.lock-real { position: absolute; opacity: 0; pointer-events: none; height: 0; }
-.lock-enter-btn {
-  width: 100%; margin-top: 18px; padding: 13px;
-  background: #7A5C38; border: none; border-radius: 3px;
-  color: #FDFAF5; font-family: 'Noto Sans KR', sans-serif;
-  font-size: 14px; font-weight: 700; cursor: pointer;
-  letter-spacing: 1.5px; transition: all .2s;
-}
-.lock-enter-btn:hover { background: #241C0E; }
-.lock-enter-btn:active { transform: scale(.99); }
-.lock-err { font-size: 11.5px; color: #B84C3A; margin-top: 8px; min-height: 18px; }
-.lock-cancel {
-  margin-top: 12px; background: none; border: none; color: #B0A090;
-  font-family: 'Noto Sans KR', sans-serif; font-size: 12px; cursor: pointer;
-  text-decoration: underline; text-underline-offset: 3px; transition: color .2s;
-}
-.lock-cancel:hover { color: #7A5C38; }
-
-/* ══════════════════════════════
-   ADMIN PAGE — 밝은 테마
-══════════════════════════════ */
-#page-admin {
-  display: none;
-  min-height: 100vh;
-  background: #F4F2EE;
-  color: #2C2416;
-}
-#page-admin.active { display: block; }
-
-.admin-topbar {
-  background: #fff; border-bottom: 1px solid #E2D9CC;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 28px; height: 56px; position: sticky; top: 0; z-index: 100;
-  box-shadow: 0 1px 6px rgba(60,40,10,.07);
-}
-.admin-logo {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 18px; font-weight: 700; letter-spacing: 4px; color: #7A5C38;
-}
-.admin-logo span {
-  font-family: 'Noto Sans KR', sans-serif;
-  font-size: 10px; color: #9A8E7A; letter-spacing: 1px; margin-left: 10px; font-weight: 400;
-}
-.admin-logout-btn {
-  background: none; border: 1px solid #DDD5C4; border-radius: 3px;
-  padding: 6px 14px; color: #9A8E7A;
-  font-family: 'Noto Sans KR', sans-serif; font-size: 12px; cursor: pointer; transition: all .2s;
-}
-.admin-logout-btn:hover { border-color: #7A5C38; color: #7A5C38; }
-
-/* admin tabs */
-.admin-tabs {
-  display: flex; border-bottom: 1px solid #E2D9CC;
-  background: #fff; padding: 0 8px;
-  overflow-x: auto; -webkit-overflow-scrolling: touch;
-}
-.admin-tabs::-webkit-scrollbar { display: none; }
-.admin-tab {
-  padding: 13px 14px; background: none; border: none;
-  border-bottom: 2px solid transparent; margin-bottom: -1px;
-  color: #9A8E7A; font-family: 'Noto Sans KR', sans-serif;
-  font-size: 12px; font-weight: 500; cursor: pointer; transition: all .2s;
-  display: flex; align-items: center; gap: 5px;
-  white-space: nowrap; flex-shrink: 0;
-}
-.admin-tab.active { color: #7A5C38; border-bottom-color: #7A5C38; }
-.admin-tab .a-badge {
-  background: #C0614A; color: #fff; font-size: 10px; font-weight: 700;
-  padding: 1px 6px; border-radius: 8px; display: none;
-}
-.admin-tab .a-badge.show { display: inline; }
-
-.admin-content { padding: 28px 28px 60px; max-width: 1000px; }
-
-/* stats */
-.a-stats { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
-.a-stat {
-  background: #fff; border: 1px solid #E2D9CC;
-  border-radius: 4px; padding: 16px 20px; flex: 1; min-width: 110px;
-  box-shadow: 0 1px 4px rgba(60,40,10,.05);
-}
-.a-stat-val { font-size: 28px; font-weight: 700; color: #7A5C38; line-height: 1; }
-.a-stat-lbl { font-size: 11px; color: #9A8E7A; margin-top: 4px; letter-spacing: .5px; }
-
-/* panel */
-.a-panel { display: none; }
-.a-panel.active { display: block; }
-
-/* toolbar */
-.a-toolbar { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; align-items: center; }
-.a-search { position: relative; flex: 1; min-width: 160px; }
-.a-search input {
-  width: 100%; background: #fff; border: 1px solid #DDD5C4;
-  border-radius: 3px; padding: 10px 14px 10px 36px; color: #2C2416;
-  font-family: 'Noto Sans KR', sans-serif; font-size: 13px; outline: none;
-  transition: border-color .2s; box-shadow: 0 1px 3px rgba(60,40,10,.05);
-}
-.a-search input:focus { border-color: #A67C52; box-shadow: 0 0 0 3px rgba(122,92,56,.08); }
-.a-search input::placeholder { color: #C8BFB0; }
-.a-search-ico {
-  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
-  font-size: 14px; color: #B0A090; pointer-events: none;
-}
-.btn-a-neutral {
-  padding: 10px 15px; background: #fff;
-  border: 1px solid #DDD5C4; border-radius: 3px; color: #5A4E3A;
-  font-family: 'Noto Sans KR', sans-serif; font-size: 12px; font-weight: 500;
-  cursor: pointer; white-space: nowrap; transition: all .2s;
-  box-shadow: 0 1px 3px rgba(60,40,10,.05);
-}
-.btn-a-neutral:hover { border-color: #A67C52; color: #7A5C38; background: #FFF8EF; }
-.btn-a-neutral:disabled { opacity: .4; cursor: not-allowed; }
-.btn-a-danger {
-  padding: 10px 15px; background: #fff;
-  border: 1px solid #D4826A; border-radius: 3px; color: #B84C3A;
-  font-family: 'Noto Sans KR', sans-serif; font-size: 12px; font-weight: 500;
-  cursor: pointer; white-space: nowrap; transition: all .2s;
-  box-shadow: 0 1px 3px rgba(60,40,10,.05);
-}
-.btn-a-danger:hover { background: #FFF0ED; }
-
-/* checkbox */
-.a-cb { width: 16px; height: 16px; accent-color: #7A5C38; cursor: pointer; }
-
-/* table */
-.a-table-wrap {
-  background: #fff; border: 1px solid #E2D9CC;
-  border-radius: 4px; overflow: hidden;
-  box-shadow: 0 1px 6px rgba(60,40,10,.06);
-}
-.a-table-scroll { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; min-width: 580px; }
-thead tr { background: #F9F6F1; }
-th {
-  padding: 11px 14px; text-align: left; font-size: 10.5px; font-weight: 600;
-  color: #9A8E7A; letter-spacing: .8px; text-transform: uppercase;
-  border-bottom: 1px solid #E2D9CC; white-space: nowrap;
-}
-td {
-  padding: 12px 14px; font-size: 13px; border-bottom: 1px solid #EEE8DE;
-  color: #2C2416; vertical-align: middle;
-}
-tbody tr:last-child td { border-bottom: none; }
-tbody tr:hover td { background: #FBF8F2; }
-tbody tr.selected td { background: #FFF5E6; }
-.td-pw { font-family: monospace; letter-spacing: 4px; color: #7A5C38; font-size: 15px; }
-.td-date { font-size: 11px; color: #9A8E7A; }
-.td-name { font-weight: 600; }
-.td-phone { color: #7A6A58; font-size: 12.5px; }
-.empty-td { text-align: center; color: #B0A090; padding: 36px !important; }
-
-/* table buttons */
-.btn-t-edit, .btn-t-del, .btn-t-save, .btn-t-cancel {
-  padding: 5px 11px; border-radius: 3px; font-family: 'Noto Sans KR', sans-serif;
-  font-size: 11px; cursor: pointer; transition: all .2s; margin-right: 4px;
-}
-.btn-t-edit {
-  background: #FFF5E6; border: 1px solid #C9A96E; color: #7A5C38; font-weight: 500;
-}
-.btn-t-edit:hover { background: #FFE8C8; border-color: #A67C52; }
-.btn-t-del {
-  background: #fff; border: 1px solid #DDD5C4; color: #9A8E7A;
-}
-.btn-t-del:hover { border-color: #D4826A; color: #B84C3A; background: #FFF0ED; }
-.btn-t-save {
-  background: #EEF8F2; border: 1px solid #7ABF9A; color: #3A7A58; font-weight: 500;
-}
-.btn-t-cancel { background: #fff; border: 1px solid #DDD5C4; color: #9A8E7A; }
-.td-input {
-  background: #FFFAF5; border: 1px solid #C9A96E; border-radius: 2px;
-  padding: 5px 9px; color: #2C2416; font-family: 'Noto Sans KR', sans-serif; font-size: 13px;
-  outline: none; width: 100%;
-}
-
-/* request items */
-.req-list { display: flex; flex-direction: column; gap: 10px; }
-.req-card {
-  background: #fff; border: 1px solid #E2D9CC; border-radius: 4px;
-  padding: 16px 18px; display: flex; align-items: center;
-  justify-content: space-between; gap: 14px; flex-wrap: wrap;
-  box-shadow: 0 1px 4px rgba(60,40,10,.05);
-  animation: fadeIn .2s ease;
-}
-@keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
-.req-card.done { background: #F9F6F1; border-color: #E8E0D0; }
-.req-card-info .req-name { font-size: 15px; font-weight: 600; color: #2C2416; }
-.req-card-info .req-phone { font-size: 12px; color: #7A6A58; margin-top: 3px; }
-.req-card-info .req-time { font-size: 11px; color: #B0A090; margin-top: 2px; }
-.req-card-actions { display: flex; gap: 8px; flex-shrink: 0; }
-.btn-resolve {
-  padding: 7px 14px; background: #EEF8F2;
-  border: 1px solid #7ABF9A; border-radius: 3px; color: #3A7A58;
-  font-family: 'Noto Sans KR', sans-serif; font-size: 12px; font-weight: 500; cursor: pointer; transition: all .2s;
-}
-.btn-resolve:hover { background: #D8F0E4; }
-.btn-req-del {
-  padding: 7px 14px; background: #fff;
-  border: 1px solid #DDD5C4; border-radius: 3px; color: #9A8E7A;
-  font-family: 'Noto Sans KR', sans-serif; font-size: 12px; cursor: pointer; transition: all .2s;
-}
-.btn-req-del:hover { border-color: #D4826A; color: #B84C3A; background: #FFF0ED; }
-.req-empty {
-  color: #B0A090; font-size: 13px; padding: 36px; text-align: center;
-  background: #fff; border: 1px solid #E2D9CC; border-radius: 4px;
-}
-.new-dot {
-  display: inline-block; width: 7px; height: 7px;
-  background: #C0614A; border-radius: 50%; margin-right: 6px; flex-shrink: 0;
-}
-
-/* ══════════════════════════════
-   MODALS
-══════════════════════════════ */
-.modal-bg {
-  display: none; position: fixed; inset: 0;
-  background: rgba(36,28,14,.5); z-index: 300;
-  align-items: center; justify-content: center; padding: 20px;
-  backdrop-filter: blur(2px);
-}
-.modal-bg.open { display: flex; }
-.modal {
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: 4px; width: 100%; max-width: 360px;
-  padding: 28px 26px 22px; position: relative;
-  box-shadow: 0 12px 40px rgba(36,28,14,.2);
-  animation: slideUp .22s ease;
-}
-@keyframes slideUp { from{transform:translateY(14px);opacity:0} to{transform:translateY(0);opacity:1} }
-.modal::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-  background: linear-gradient(90deg, transparent, var(--brown-lt) 40%, var(--brown) 50%, var(--brown-lt) 60%, transparent);
-}
-.modal-title { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 600; margin-bottom: 4px; }
-.modal-sub { font-size: 12px; color: var(--muted); line-height: 1.7; margin-bottom: 18px; }
-.modal-close {
-  position: absolute; top: 12px; right: 14px;
-  background: none; border: none; font-size: 20px; color: var(--muted); cursor: pointer;
-}
-.modal-sent { display: none; text-align: center; padding: 4px 0; }
-.modal-sent-icon { font-size: 28px; margin-bottom: 8px; }
-.modal-sent p { font-size: 12.5px; color: var(--muted); line-height: 1.8; }
-
-/* CONFIRM */
-.confirm-overlay {
-  display: none; position: fixed; inset: 0;
-  background: rgba(60,40,10,.35); z-index: 600;
-  align-items: center; justify-content: center; padding: 20px;
-  backdrop-filter: blur(2px);
-}
-.confirm-overlay.open { display: flex; }
-.confirm-box {
-  background: #fff; border: 1px solid #E2D9CC;
-  border-radius: 4px; padding: 28px 24px 22px;
-  width: 100%; max-width: 300px; text-align: center;
-  box-shadow: 0 12px 40px rgba(60,40,10,.15);
-  animation: slideUp .2s ease;
-}
-.confirm-box h3 { font-size: 16px; color: #2C2416; margin-bottom: 8px; }
-.confirm-box p { font-size: 12.5px; color: #9A8E7A; line-height: 1.7; margin-bottom: 20px; }
-.confirm-btns { display: flex; gap: 10px; }
-.c-cancel {
-  flex: 1; padding: 10px; background: #fff;
-  border: 1px solid #DDD5C4; border-radius: 3px; color: #9A8E7A;
-  font-family: 'Noto Sans KR', sans-serif; font-size: 13px; cursor: pointer; transition: all .2s;
-}
-.c-cancel:hover { border-color: #A67C52; color: #7A5C38; }
-.c-ok {
-  flex: 1; padding: 10px; background: #C0614A; border: none; border-radius: 3px;
-  color: #fff; font-family: 'Noto Sans KR', sans-serif; font-size: 13px; font-weight: 700;
-  cursor: pointer; transition: filter .2s;
-}
-.c-ok:hover { filter: brightness(1.1); }
-
-/* TOAST */
-#toast {
-  position: fixed; bottom: 28px; left: 50%;
-  transform: translateX(-50%) translateY(12px);
-  background: #241C0E; border-radius: 2px;
-  padding: 10px 20px; font-size: 13px; color: #FDFAF5;
-  opacity: 0; pointer-events: none; white-space: nowrap;
-  transition: all .25s; z-index: 9999;
-}
-#toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
-
-@media(max-width:480px){
-  .ticket-body{padding:24px 18px 20px;}
-  .ticket-stub{padding:12px 18px 16px;}
-  .admin-content{padding:20px 14px 60px;}
-  .admin-topbar,.admin-tabs{padding:0 14px;}
-  .admin-tab{padding:12px 14px;font-size:12px;}
-}
 </style>
 </head>
 <body>
 
-<!-- ════════ USER PAGE ════════ -->
-<div id="page-user">
+<!-- ════════ 메인 화면 ════════ -->
+<div id="page-home">
   <div class="header">
     <div style="position:relative;display:inline-block;padding:8px 16px;">
       <img src="data:image/png;base64,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" alt=""
            style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-                  width:220px;height:220px;object-fit:contain;opacity:.13;pointer-events:none;z-index:0;">
+                  width:190px;height:190px;object-fit:contain;opacity:.15;pointer-events:none;z-index:0;">
       <div class="logo" style="position:relative;z-index:1;">MUAH TICKET</div>
     </div>
     <div class="logo-rule"><div class="logo-diamond"></div></div>
@@ -905,161 +446,20 @@ tbody tr.selected td { background: #FFF5E6; }
   <div class="ticket">
     <div class="cutout-l"></div>
     <div class="cutout-r"></div>
-    <div class="ticket-body">
-      <div class="u-tabs">
-        <button class="u-tab active" onclick="switchUTab('login')">로그인</button>
-        <button class="u-tab" onclick="switchUTab('setup')">비밀번호 설정</button>
-      </div>
-
-      <!-- 예매 조회 -->
-      <div class="u-panel active" id="u-login">
-        <div class="s-title">로그인</div>
-        <div class="s-sub">이름 · 휴대폰 번호 · 비밀번호로 로그인해요.</div>
-        <div class="field">
-          <label class="field-label">이름</label>
-          <input type="text" id="l-name" placeholder="홍길동">
-        </div>
-        <div class="field">
-          <label class="field-label">휴대폰 번호</label>
-          <input type="tel" id="l-phone" placeholder="010-0000-0000" maxlength="13" oninput="fmtPhone(this)">
-        </div>
-        <div class="field">
-          <label class="field-label">비밀번호</label>
-          <div class="pin-display" id="lDisp" onclick="document.getElementById('l-pr').focus()"></div>
-          <input type="tel" id="l-pr" class="pin-real" maxlength="6" oninput="pinIn('l')">
-          <div class="pin-hint" id="lHint"></div>
-        </div>
-        <button class="btn-main" onclick="doLogin()">로그인하기</button>
-      </div>
-
-      <!-- 비밀번호 설정 -->
-      <div class="u-panel" id="u-setup">
-        <div id="ss1">
-          <div class="step-row">
-            <div class="step-seg on"></div><div class="step-seg"></div>
-            <span class="step-lbl">1 / 2 — 본인 확인</span>
-          </div>
-          <div class="s-title">본인 확인</div>
-          <div class="s-sub">이름과 휴대폰 번호를 입력해주세요.</div>
-          <div class="field">
-            <label class="field-label">이름</label>
-            <input type="text" id="s-name" placeholder="홍길동">
-          </div>
-          <div class="field">
-            <label class="field-label">휴대폰 번호</label>
-            <input type="tel" id="s-phone" placeholder="010-0000-0000" maxlength="13" oninput="fmtPhone(this)">
-          </div>
-          <button class="btn-main" onclick="goStep2()">다음</button>
-        </div>
-
-        <div id="ss2" style="display:none">
-          <div class="step-row">
-            <div class="step-seg on"></div><div class="step-seg on"></div>
-            <span class="step-lbl">2 / 2 — 비밀번호 설정</span>
-          </div>
-          <div class="s-title">비밀번호 설정</div>
-          <div class="s-sub">숫자 6자리로 설정해요.<br>두 칸이 일치해야 설정이 완료돼요.</div>
-          <div class="field">
-            <label class="field-label">비밀번호 (숫자 6자리)</label>
-            <div class="pin-display" id="sDisp" onclick="document.getElementById('s-pr').focus()"></div>
-            <input type="tel" id="s-pr" class="pin-real" maxlength="6" oninput="pinIn('s')">
-            <div class="pin-hint" id="sHint"></div>
-          </div>
-          <div class="field" id="cwrap">
-            <label class="field-label">비밀번호 확인</label>
-            <div class="pin-display" id="cDisp" onclick="document.getElementById('c-pr').focus()"></div>
-            <input type="tel" id="c-pr" class="pin-real" maxlength="6" oninput="pinIn('c')">
-            <div class="pin-hint" id="cHint"></div>
-          </div>
-          <button class="btn-main" onclick="doSetPw()">비밀번호 설정 완료</button>
-        </div>
-
-        <div class="success-view" id="ssDone">
-          <div class="success-mark">✓</div>
-          <h2>설정 완료</h2>
-          <p>비밀번호가 저장됐어요.<br>이름 · 번호 · 비밀번호로<br>예매를 확인할 수 있어요.</p>
-          <button class="btn-main" style="margin-top:18px" onclick="switchUTab('login')">로그인하러 가기</button>
-        </div>
-      </div>
+    <div class="ticket-body" style="text-align:center; padding:48px 30px 40px;">
+      <div class="s-title" style="font-family:'Noto Sans KR',sans-serif; font-size:21px; font-weight:600; margin-bottom:10px; letter-spacing:.3px;">뮤아지경 뮤지컬 예매</div>
+      <div class="s-sub" style="margin-bottom:32px;">원하시는 공연 일정을 선택하고<br>바로 예매를 진행해주세요.</div>
+      <button class="btn-main" onclick="goBooking()" style="padding:16px;">뮤아티켓 예매 들어가기</button>
     </div>
-
-    <div class="ticket-stub">
-      <div class="stub-text">비밀번호가 기억나지 않으시나요?</div>
-      <button class="stub-link" onclick="openPwModal()">관리자에게 비밀번호 전송 요청하기</button>
-      <div style="margin-top:10px;font-size:11px;color:var(--muted);line-height:1.7;">
-        그 외 문의사항은 관리자에게 연락해주세요<br>
-        <span style="color:var(--brown);font-weight:500;">📞 010-9920-6992</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- 숨겨진 관리자 버튼 -->
-  <button class="admin-trigger" onclick="openAdminLock()" title="">
-    <div class="admin-trigger-dot"></div>
-  </button>
-</div>
-
-<!-- ════════ HOME PAGE ════════ -->
-<div id="page-home">
-  <div class="home-header">
-    <div style="position:relative;display:inline-block;padding:8px 16px;">
-      <img src="data:image/png;base64,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" alt=""
-           style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-                  width:220px;height:220px;object-fit:contain;opacity:.13;pointer-events:none;z-index:0;">
-      <div class="logo" style="position:relative;z-index:1;">MUAH TICKET</div>
-    </div>
-    <div class="logo-rule"><div class="logo-diamond"></div></div>
-    <div class="logo-sub">Musical Reservation System</div>
-  </div>
-
-  <div class="home-welcome" id="homeWelcome">환영해요!</div>
-
-  <div class="home-card">
-    <div class="home-card-body">
-      <div class="home-card-title">무엇을 도와드릴까요?</div>
-      <div class="home-btn-grid">
-
-        <button class="home-btn" onclick="goPage('booking')">
-          <div class="home-btn-icon" style="background:#fff;border:1.5px solid var(--border);overflow:hidden;"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4Ij4KICA8IS0tIOuwsOqyvSDsm5Ag7JeG7J2MIOKAlCBob21lLWJ0bi1pY29u7J20IOybkO2YlSDsu6jthYzsnbTrhIgg7Jet7ZWgIC0tPgogIDwhLS0g66y064yAIOuwlOuLpSAtLT4KICA8cmVjdCB4PSI2IiB5PSIzNCIgd2lkdGg9IjM2IiBoZWlnaHQ9IjQiIHJ4PSIyIiBmaWxsPSIjQzlBOTZFIi8+CiAgPCEtLSDsmbzsqr0g7Luk7Yq8IC0tPgogIDxwYXRoIGQ9Ik02IDggUTEwIDEyIDggMjAgUTkgMjcgNiAzNCBMMTQgMzQgUTE2IDI2IDE1IDE5IFExOCAxMiAxNCA4IFoiIGZpbGw9IiNBNjdDNTIiLz4KICA8IS0tIOyYpOuluOyqvSDsu6TtirwgLS0+CiAgPHBhdGggZD0iTTQyIDggUTM4IDEyIDQwIDIwIFEzOSAyNyA0MiAzNCBMMzQgMzQgUTMyIDI2IDMzIDE5IFEzMCAxMiAzNCA4IFoiIGZpbGw9IiNBNjdDNTIiLz4KICA8IS0tIOy7pO2KvCDsg4Hri6gg67SJIC0tPgogIDxyZWN0IHg9IjUiIHk9IjciIHdpZHRoPSIzOCIgaGVpZ2h0PSIzIiByeD0iMS41IiBmaWxsPSIjN0E1QzM4Ii8+CiAgPCEtLSDsiqTtj6ztirjrnbzsnbTtirgg67mbIC0tPgogIDxwYXRoIGQ9Ik0yNCAxMiBMMTggMzQgTDMwIDM0IFoiIGZpbGw9InJnYmEoMjU1LDIyMCwxMjAsMC40NSkiLz4KICA8IS0tIOyKpO2PrO2KuOudvOydtO2KuCDsm5AgLS0+CiAgPGNpcmNsZSBjeD0iMjQiIGN5PSIxMCIgcj0iNCIgZmlsbD0iI0YwQzA2MCIgc3Ryb2tlPSIjQzlBOTZFIiBzdHJva2Utd2lkdGg9IjEuMiIvPgogIDwhLS0g67OE67mbIO2aqOqzvCAtLT4KICA8Y2lyY2xlIGN4PSIyNCIgY3k9IjEwIiByPSIxLjUiIGZpbGw9IiNmZmYiLz4KPC9zdmc+" style="width:34px;height:34px;object-fit:contain;"></div>
-          <div class="home-btn-text">
-            <div class="home-btn-label">공연 예매하기</div>
-            <div class="home-btn-desc">원하는 공연의 날짜와 좌석을 선택해요</div>
-          </div>
-          <div class="home-btn-arrow">›</div>
-        </button>
-
-        <button class="home-btn" onclick="goPage('myticket')">
-          <div class="home-btn-icon">🎫</div>
-          <div class="home-btn-text">
-            <div class="home-btn-label">예매 조회하기</div>
-            <div class="home-btn-desc">예매 내역과 티켓을 확인해요</div>
-          </div>
-          <div class="home-btn-arrow">›</div>
-        </button>
-
-        <button class="home-btn" onclick="goPage('change')">
-          <div class="home-btn-icon">📅</div>
-          <div class="home-btn-text">
-            <div class="home-btn-label">공연 날짜 취소 및 변경</div>
-            <div class="home-btn-desc">예매한 공연 일정을 변경하거나 취소해요</div>
-          </div>
-          <div class="home-btn-arrow">›</div>
-        </button>
-
-      </div>
-    </div>
-  </div>
-
-  <button class="home-logout" onclick="doLogout()">로그아웃</button>
-  <div style="font-size:10.5px;color:var(--muted2);margin-top:10px;text-align:center;line-height:1.6;">
-    예매 정보는 이 브라우저에 저장돼요.<br>같은 브라우저에서 열면 유지됩니다.
   </div>
 </div>
 
-<!-- ════════ BOOKING PAGE ════════ -->
+<div id="toast"></div>
+
+<!-- ════════ 예매 화면 ════════ -->
 <div id="page-booking">
   <div class="booking-topbar">
-    <button class="booking-back" onclick="goHome()">‹</button>
+    <button class="booking-back" onclick="goBack()">‹</button>
     <div class="booking-topbar-title">공연 예매</div>
   </div>
 
@@ -1075,18 +475,18 @@ tbody tr.selected td { background: #FFF5E6; }
       <!-- 슬라이드 0: 공연 안내사항 -->
       <div class="booking-slide">
         <div class="info-section">
-          <div class="info-section-title">📋 공연 안내사항</div>
+          <div class="info-section-title">공연 안내사항</div>
           <div id="noticeContent" class="info-text"></div>
         </div>
       </div>
 
-      <!-- 슬라이드 1: 공연 정보 -->
+      <!-- 슬라이드 1: 공연 정보 (텍스트 먼저, 포스터 아래) -->
       <div class="booking-slide">
-        <div class="info-section" style="margin-bottom:20px">
-          <div class="info-section-title"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMCAyMCIgd2lkdGg9IjIwIiBoZWlnaHQ9IjIwIj4KICA8cGF0aCBkPSJNMTAgMiBMNiA4IEwxNCA4IFoiIGZpbGw9IiNBNjdDNTIiLz4KICA8cGF0aCBkPSJNNiA4IEwzIDE3IEwxNyAxNyBMMTQgOCBaIiBmaWxsPSJub25lIiBzdHJva2U9IiM3QTVDMzgiIHN0cm9rZS13aWR0aD0iMS40IiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CiAgPGxpbmUgeDE9IjEwIiB5MT0iOCIgeDI9IjEwIiB5Mj0iMTciIHN0cm9rZT0iI0M1Qjk5RSIgc3Ryb2tlLXdpZHRoPSIxIi8+CiAgPGVsbGlwc2UgY3g9IjEwIiBjeT0iMTciIHJ4PSI1IiByeT0iMS41IiBmaWxsPSJub25lIiBzdHJva2U9IiM3QTVDMzgiIHN0cm9rZS13aWR0aD0iMS4yIi8+Cjwvc3ZnPg==" style="width:18px;height:18px;vertical-align:-3px;margin-right:5px;">공연 정보</div>
+        <div class="info-section">
+          <div class="info-section-title">공연 정보</div>
           <div id="showInfoContent" class="info-text"></div>
         </div>
-        <div id="posterWrap"></div>
+        <div id="posterWrap" style="margin-top:20px"></div>
       </div>
 
       <!-- 슬라이드 2: 공연 예매하기 -->
@@ -1094,1162 +494,287 @@ tbody tr.selected td { background: #FFF5E6; }
         <div class="show-select-title">공연 날짜 선택</div>
         <div class="show-select-sub">원하시는 공연 일정을 선택해주세요.</div>
         <div class="show-date-grid">
-          <button class="show-date-btn" onclick="selectShow('2025-08-22-14')">
+          <button class="show-date-btn" onclick="selectShow('2025-08-15-14')">
             <div>
-              <div class="sdb-day">8월 22일 토요일</div>
+              <div class="sdb-day">8월 15일 토요일</div>
               <div class="sdb-time">오후 2:00</div>
             </div>
             <span class="sdb-tag">선택하기</span>
           </button>
-          <button class="show-date-btn" onclick="selectShow('2025-08-22-18')">
+          <button class="show-date-btn" onclick="selectShow('2025-08-15-18')">
             <div>
-              <div class="sdb-day">8월 22일 토요일</div>
+              <div class="sdb-day">8월 15일 토요일</div>
               <div class="sdb-time">오후 6:00</div>
             </div>
             <span class="sdb-tag">선택하기</span>
           </button>
-          <button class="show-date-btn" onclick="selectShow('2025-08-23-13')">
+          <button class="show-date-btn" onclick="selectShow('2025-08-16-13')">
             <div>
-              <div class="sdb-day">8월 23일 일요일</div>
+              <div class="sdb-day">8월 16일 일요일</div>
               <div class="sdb-time">오후 1:00</div>
             </div>
             <span class="sdb-tag">선택하기</span>
           </button>
-          <button class="show-date-btn" onclick="selectShow('2025-08-23-17')">
+          <button class="show-date-btn" onclick="selectShow('2025-08-16-16')">
             <div>
-              <div class="sdb-day">8월 23일 일요일</div>
-              <div class="sdb-time">오후 5:00</div>
+              <div class="sdb-day">8월 16일 일요일</div>
+              <div class="sdb-time">오후 4:00</div>
             </div>
             <span class="sdb-tag">선택하기</span>
           </button>
         </div>
+
+        <button class="btn-main" onclick="goBookingStep2()" style="margin-top:20px;">다음</button>
+
+        <div class="change-notice">
+          <strong>예매 변경·취소가 필요하신 경우</strong>
+          <div class="change-notice-sub">(성함, 연락처, 예매한 날짜를 알려주세요)</div>
+          <div class="change-notice-row"><span>변경</span> 원하시는 날짜로 다시 예매 후 연락</div>
+          <div class="change-notice-row"><span>취소</span> 연락 주시면 바로 처리해드려요</div>
+          <div class="change-notice-phone">예매 관리자 <strong>010-9920-6992</strong></div>
+        </div>
       </div>
 
     </div>
+  </div>
+</div>
+
+<!-- ════════ 예매자 정보 입력 모달 ════════ -->
+<div class="modal-bg" id="bookingFormModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeBookingFormModal()">×</button>
+    <div class="modal-title">예매자 정보 입력</div>
+    <div class="modal-sub" id="bfSelectedShow"></div>
+
+    <div class="field">
+      <label class="field-label">성함과 연락처(대표자 1인) <span class="req-mark">*필수</span></label>
+      <input type="text" id="bf-name" placeholder="이름">
+      <input type="tel" id="bf-phone" placeholder="010-0000-0000" maxlength="13" oninput="fmtPhone(this)" style="margin-top:8px;">
+    </div>
+    <div class="field">
+      <label class="field-label">본인 포함 총 인원 수(숫자만) <span class="req-mark">*필수</span></label>
+      <input type="tel" id="bf-count" placeholder="예: 2" maxlength="2">
+    </div>
+    <div class="field">
+      <label class="field-label">배우들에게 응원의 한마디를 남겨 주세요! <span class="opt-mark">선택</span></label>
+      <textarea id="bf-message" placeholder="따뜻한 응원의 말을 남겨주세요" rows="3" style="width:100%;background:#fff;border:1px solid var(--border);border-radius:2px;padding:13px;font-family:'Noto Sans KR',sans-serif;font-size:16px;outline:none;resize:vertical;"></textarea>
+    </div>
+
+    <button class="btn-main" onclick="openBookingConfirm()">예매하기</button>
   </div>
 </div>
 
 <!-- ════════ 예매 확인 모달 ════════ -->
-<div class="booking-confirm-modal" id="bookingConfirmModal">
-  <div class="bcm-sheet">
-    <div class="bcm-handle"></div>
-    <div class="bcm-title">예매 확인</div>
-    <div class="bcm-sub">아래 정보로 예매를 진행할까요?</div>
-    <div class="bcm-selected">
-      <div style="font-size:13px;font-weight:500;color:var(--brown);letter-spacing:2px;font-family:'Cormorant Garamond',serif;">MUAH TICKET</div>
-      <div>
-        <div class="bcm-sel-day" id="bcmDay"></div>
-        <div class="bcm-sel-time" id="bcmTime"></div>
-      </div>
-    </div>
-    <div class="bcm-user-info" id="bcmUserInfo"></div>
-    <div class="bcm-btns">
-      <button class="bcm-cancel-btn" onclick="closeBookingModal()">취소</button>
-      <button class="bcm-ok-btn" onclick="confirmBooking()">예매하기</button>
-    </div>
-  </div>
-</div>
-
-<!-- ════════ 예매 조회 페이지 ════════ -->
-<div class="booking-status-page" id="page-myticket">
-  <div class="booking-topbar">
-    <button class="booking-back" onclick="goHome()">‹</button>
-    <div class="booking-topbar-title">예매 조회</div>
-  </div>
-  <div id="myTicketContent"></div>
-</div>
-
-<!-- ════════ 취소·변경 페이지 ════════ -->
-<div class="booking-status-page" id="page-change">
-  <div class="booking-topbar">
-    <button class="booking-back" onclick="goHome()">‹</button>
-    <div class="booking-topbar-title">공연 날짜 취소 및 변경</div>
-  </div>
-  <div id="changeTicketContent"></div>
-  <div class="change-panel" id="changePanel">
-    <div class="change-panel-title">변경할 날짜를 선택해주세요</div>
-    <div class="show-date-grid" id="changeDateGrid" style="padding-bottom:8px"></div>
-  </div>
-</div>
-
-<!-- ════════ ADMIN LOCK OVERLAY ════════ -->
-<div class="admin-lock-overlay" id="adminLockOverlay">
-  <div class="lock-box">
-    <div class="lock-icon">🔐</div>
-    <div class="lock-title">ADMIN</div>
-    <div class="lock-sub">관리자 비밀번호를 입력해주세요</div>
-    <div class="field" style="margin-bottom:6px;text-align:left">
-      <input type="password" id="lock-pw" placeholder="비밀번호 입력"
-             style="width:100%;background:#FAF7F2;border:1.5px solid #DDD5C4;border-radius:4px;padding:13px 14px;font-family:'Noto Sans KR',sans-serif;font-size:15px;color:#241C0E;outline:none;transition:border-color .2s;"
-             oninput="document.getElementById('lockErr').textContent=''"
-             onkeydown="if(event.key==='Enter')tryAdminEnter()">
-    </div>
-    <div class="lock-err" id="lockErr"></div>
-    <button class="lock-enter-btn" onclick="tryAdminEnter()">입장하기</button>
-    <br><button class="lock-cancel" onclick="closeAdminLock()">취소</button>
-  </div>
-</div>
-
-<!-- ════════ ADMIN PAGE ════════ -->
-<div id="page-admin">
-  <div class="admin-topbar">
-    <div class="admin-logo">ADMIN <span>MUAH TICKET</span></div>
-    <button class="admin-logout-btn" onclick="adminLogout()">← 나가기</button>
-  </div>
-
-  <div class="admin-tabs">
-    <button class="admin-tab active" onclick="switchAdminTab('users')" id="tab-users">회원 관리</button>
-    <button class="admin-tab" onclick="switchAdminTab('bookings')" id="tab-bookings">
-      예매 관리 <span class="a-badge" id="bookingBadge">0</span>
-    </button>
-    <button class="admin-tab" onclick="switchAdminTab('reqs')" id="tab-reqs">
-      비밀번호 요청 <span class="a-badge" id="reqBadge">0</span>
-    </button>
-    <button class="admin-tab" onclick="switchAdminTab('content')" id="tab-content">콘텐츠 관리</button>
-  </div>
-
-  <div class="admin-content">
-    <!-- stats -->
-    <div class="a-stats">
-      <div class="a-stat">
-        <div class="a-stat-val" id="statTotal">0</div>
-        <div class="a-stat-lbl">전체 계정</div>
-      </div>
-      <div class="a-stat">
-        <div class="a-stat-val" id="statBookings">0</div>
-        <div class="a-stat-lbl">예매 건수</div>
-      </div>
-      <div class="a-stat">
-        <div class="a-stat-val" id="statReqs">0</div>
-        <div class="a-stat-lbl">미처리 요청</div>
-      </div>
-    </div>
-
-    <!-- 예매자 조회 -->
-    <div class="a-panel active" id="ap-users">
-      <div class="a-toolbar">
-        <div class="a-search">
-          <span class="a-search-ico">🔍</span>
-          <input type="text" id="searchInp" placeholder="이름 또는 번호 입력..."
-                 onkeydown="if(event.key==='Enter')renderTable()">
-        </div>
-        <button class="btn-a-neutral" onclick="renderTable()">검색</button>
-        <button class="btn-a-neutral" id="btnSelDel" onclick="confirmSelDel()" disabled>선택 삭제</button>
-      </div>
-      <div class="a-table-wrap">
-        <div class="a-table-scroll">
-          <table>
-            <thead><tr>
-              <th><input type="checkbox" class="a-cb" id="cbAll" onchange="toggleAllCb(this)"></th>
-              <th>#</th><th>이름</th><th>휴대폰 번호</th>
-              <th>예매 공연</th><th>등록 일시</th><th>관리</th>
-            </tr></thead>
-            <tbody id="aTbody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- 예매 관리 -->
-    <div class="a-panel" id="ap-bookings">
-      <div class="a-toolbar">
-        <div class="a-search">
-          <span class="a-search-ico">🔍</span>
-          <input type="text" id="bookingSearchInp" placeholder="이름 또는 번호 입력..."
-                 onkeydown="if(event.key==='Enter')renderBookingsAdmin()">
-        </div>
-        <button class="btn-a-neutral" onclick="renderBookingsAdmin()">검색</button>
-        <select id="bookingStatusFilter" onchange="renderBookingsAdmin()"
-          style="padding:10px 12px;border:1px solid #DDD5C4;border-radius:3px;background:#fff;color:#2C2416;font-family:'Noto Sans KR',sans-serif;font-size:12px;outline:none;">
-          <option value="">전체</option>
-          <option value="booked">예매 완료</option>
-          <option value="changed">날짜 변경</option>
-          <option value="cancelled">취소</option>
-        </select>
-      </div>
-      <div id="adminBookingList"></div>
-    </div>
-
-    <!-- 비밀번호 전송 요청 -->
-    <div class="a-panel" id="ap-reqs">
-      <div id="reqList"></div>
-    </div>
-
-    <!-- 회원 관리 -->
-    <div class="a-panel" id="ap-members">
-      <div class="a-toolbar">
-        <div class="a-search">
-          <span class="a-search-ico">🔍</span>
-          <input type="text" id="memberSearchInp" placeholder="이름 또는 번호 입력..."
-                 onkeydown="if(event.key==='Enter')renderMemberTable()">
-        </div>
-        <button class="btn-a-neutral" onclick="renderMemberTable()">검색</button>
-        <button class="btn-a-neutral" id="btnMemberSelDel" onclick="confirmMemberSelDel()" disabled>선택 삭제</button>
-        <button class="btn-a-danger" onclick="confirmMemberClear()">전체 삭제</button>
-      </div>
-      <div style="background:#FFF8EF;border:1px solid #E8D5B0;border-radius:4px;padding:12px 16px;margin-bottom:14px;font-size:12.5px;color:#7A5C38;line-height:1.7;">
-        ⚠️ 타인 명의로 계정을 생성한 것으로 의심되는 경우 해당 계정을 삭제해주세요.<br>
-        계정 삭제 후 당사자에게 직접 연락하여 재등록 안내를 권장합니다.
-      </div>
-      <div class="a-table-wrap">
-        <div class="a-table-scroll">
-          <table>
-            <thead><tr>
-              <th><input type="checkbox" class="a-cb" id="cbMemberAll" onchange="toggleMemberAllCb(this)"></th>
-              <th>#</th><th>이름</th><th>휴대폰 번호</th><th>등록 일시</th><th>삭제</th>
-            </tr></thead>
-            <tbody id="memberTbody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- 공연 콘텐츠 관리 -->
-    <div class="a-panel" id="ap-content">
-      <div class="content-edit-section">
-        <div class="ce-title">📋 공연 안내사항</div>
-        <label class="ce-label">내용 편집</label>
-        <textarea class="ce-textarea" id="ce-notice" placeholder="관람 시 주의사항, 환불 규정, 입장 안내 등을 입력하세요..."></textarea>
-        <button class="btn-ce-save" style="margin-top:10px" onclick="saveContent('notice')">저장하기</button>
-      </div>
-      <div class="content-edit-section">
-        <div class="ce-title">공연 정보</div>
-        <label class="ce-label">포스터 이미지 (세로형 2:3 권장)</label>
-
-        <!-- 미리보기 + 클릭 업로드 -->
-        <div id="ceImgPreview"
-             onclick="document.getElementById('ceImgInput').click()"
-             style="width:100%;max-width:200px;aspect-ratio:2/3;margin:0 auto 14px;
-                    border:2px dashed #DDD5C4;border-radius:6px;overflow:hidden;
-                    display:flex;flex-direction:column;align-items:center;justify-content:center;
-                    background:#FAF7F2;cursor:pointer;">
-          <div id="ceImgPlaceholder" style="display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;">
-            <span style="font-size:28px;opacity:.35">📷</span>
-            <span style="font-size:11px;color:#B0A090;text-align:center;">탭해서 업로드</span>
-          </div>
-        </div>
-
-        <!-- file input: position fixed trick for mobile -->
-        <input type="file" id="ceImgInput" accept="image/*"
-               style="position:fixed;top:-100px;left:-100px;opacity:0;width:1px;height:1px;"
-               onchange="handlePosterUpload(event)">
-
-        <div style="display:flex;gap:8px;justify-content:center;margin-bottom:8px;">
-          <button class="ce-upload-btn" type="button"
-                  onclick="document.getElementById('ceImgInput').click()"
-                  style="padding:10px 18px;font-size:13px;font-weight:600;">
-            📷 사진 선택
-          </button>
-          <button class="ce-upload-btn" type="button"
-                  style="color:#B84C3A;border-color:#D4826A"
-                  onclick="removePoster()">🗑 삭제</button>
-        </div>
-        <div style="font-size:11px;color:#9A8E7A;margin-bottom:14px;line-height:1.5;text-align:center;">
-          갤러리에서 선택 · JPG, PNG, WEBP
-        </div>
-
-        <label class="ce-label">공연 정보 내용</label>
-        <textarea class="ce-textarea" id="ce-showinfo"
-                  placeholder="공연명, 출연진, 장소, 러닝타임, 관람 연령 등을 입력하세요..."></textarea>
-        <button class="btn-ce-save" style="margin-top:10px" onclick="saveContent('showinfo')">저장하기</button>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- PW 요청 모달 -->
-<div class="modal-bg" id="pwModal">
+<div class="modal-bg" id="confirmBookingModal">
   <div class="modal">
-    <button class="modal-close" onclick="closePwModal()">×</button>
-    <div id="mForm">
-      <div class="modal-title">비밀번호 전송 요청</div>
-      <div class="modal-sub">이름과 번호를 입력하면 관리자가 확인 후<br>비밀번호를 안내해드려요.</div>
-      <div class="field">
-        <label class="field-label">이름</label>
-        <input type="text" id="m-name" placeholder="홍길동">
-      </div>
-      <div class="field">
-        <label class="field-label">휴대폰 번호</label>
-        <input type="tel" id="m-phone" placeholder="010-0000-0000" maxlength="13" oninput="fmtPhone(this)">
-      </div>
-      <button class="btn-main" onclick="submitReq()">요청 보내기</button>
-    </div>
-    <div class="modal-sent" id="mSent">
-      <div class="modal-sent-icon">📨</div>
-      <p>요청이 전달됐어요.<br>관리자 확인 후 비밀번호를 안내드릴게요.</p>
-      <button class="btn-main" style="margin-top:14px" onclick="closePwModal()">확인</button>
-    </div>
+    <button class="modal-close" onclick="closeBookingModal()">×</button>
+    <div class="modal-title">예매 확인</div>
+    <div class="modal-sub" id="bcSummary"></div>
+    <button class="btn-main" onclick="submitBooking()">예매 완료하기</button>
   </div>
 </div>
 
-<!-- CONFIRM -->
-<div class="confirm-overlay" id="confirmOv">
-  <div class="confirm-box">
-    <h3 id="cTitle">확인</h3>
-    <p id="cMsg">진행하시겠어요?</p>
-    <div class="confirm-btns">
-      <button class="c-cancel" onclick="closeConfirm()">취소</button>
-      <button class="c-ok" id="cOkBtn">확인</button>
-    </div>
+<!-- ════════ 예매 완료 화면 ════════ -->
+<div class="modal-bg" id="doneModal">
+  <div class="modal" style="text-align:center;">
+    <div class="success-mark" style="margin:0 auto 14px;">✓</div>
+    <h2 style="font-family:'Cormorant Garamond',serif;font-size:21px;letter-spacing:2px;margin-bottom:7px;">예매 완료</h2>
+    <p style="color:var(--muted);font-size:12.5px;line-height:1.8;" id="doneSummary"></p>
+    <button class="btn-main" style="margin-top:20px" onclick="closeDoneModal()">확인</button>
   </div>
 </div>
-
-<div id="toast"></div>
 
 <script>
-const GAS_URL = "https://script.google.com/macros/s/AKfycbxGFsXhfUxQS74jyxgLDcqt9Zyjnxsz9cUjYrTxfERdSiuwZOVhsXQMKfe79_htp1xy1g/exec";
+// ══ 공연 일정 ══
+const SHOW_LABELS = {
+  '2025-08-15-14': { day: '8월 15일 토요일', time: '오후 2:00' },
+  '2025-08-15-18': { day: '8월 15일 토요일', time: '오후 6:00' },
+  '2025-08-16-13': { day: '8월 16일 일요일', time: '오후 1:00' },
+  '2025-08-16-16': { day: '8월 16일 일요일', time: '오후 4:00' },
+};
 
-async function gasGet(sheet) {
-  const res = await fetch(GAS_URL + "?action=get&sheet=" + sheet);
-  const text = await res.text();
-  let data;
-  try {
-    data = JSON.parse(text);
-  } catch(e) {
-    console.error("[gasGet] Invalid JSON response:", text.slice(0,300));
-    throw new Error("서버 응답 오류 (배포 설정을 확인해주세요)");
-  }
-  if(data && data.error) {
-    console.error("[gasGet] GAS error:", data.error);
-    throw new Error(data.error);
-  }
-  if(!Array.isArray(data)) {
-    console.error("[gasGet] Unexpected response:", data);
-    return [];
-  }
-  return data;
-}
-async function gasAdd(sheet, data) {
-  const res = await fetch(GAS_URL + "?action=add&sheet=" + sheet + "&data=" + encodeURIComponent(JSON.stringify(data)));
-  if(!res.ok) throw new Error("GAS ADD failed: " + res.status);
-  return await res.json();
-}
-async function gasUpdate(sheet, key, data) {
-  const res = await fetch(GAS_URL + "?action=update&sheet=" + sheet + "&key=" + encodeURIComponent(key) + "&data=" + encodeURIComponent(JSON.stringify(data)));
-  if(!res.ok) throw new Error("GAS UPDATE failed: " + res.status);
-  return await res.json();
-}
-async function gasDelete(sheet, key) {
-  const res = await fetch(GAS_URL + "?action=delete&sheet=" + sheet + "&key=" + encodeURIComponent(key));
-  if(!res.ok) throw new Error("GAS DELETE failed: " + res.status);
-  return await res.json();
-}
-async function gasSetContent(data) {
-  const res = await fetch(GAS_URL + "?action=setContent&data=" + encodeURIComponent(JSON.stringify(data)));
-  if(!res.ok) throw new Error("GAS SETCONTENT failed: " + res.status);
-  return await res.json();
-}
-async function gasGetContent() {
-  const res = await fetch(GAS_URL + "?action=getContent");
-  if(!res.ok) throw new Error("GAS GETCONTENT failed: " + res.status);
-  return await res.json();
-}
+const DEFAULT_NOTICE = `뮤아지경 제 4회 정기 공연 예매 안내사항
 
-// ══ STORAGE ══
-const ADMIN_PW = '@@mingi215';
+• 본 공연은 15세 이상 관람가입니다.
+• 본 공연은 뮤아지경 제 4회 정기 공연입니다. 예상 소요시간은 100분 입니다.
+• 본 공연은 무료로 관람하실 수 있습니다.
+• 본 공연의 티켓은 공연 시간 1시간 전부터 현장 수령이 가능하며, 수령 순으로 좌석이 배정됩니다.
+• 주차 공간이 협소하오니 대중교통 이용을 부탁드립니다.
+• 공연 입장은 고지된 공연 시간 30분 전부터 가능합니다.
+• 공연 중 사진과 영상 촬영이 불가합니다.
+• 꽃다발 및 음식물 선물은 공연장 규정상 정중히 사양하겠습니다.
+• 공연장 내 음료와 음식물 섭취 및 반입이 엄격하게 금지되어 있습니다.
+• 인터미션 없이 공연이 진행되며 공연 도중에는 입장이 제한될 수 있으니 유의하시길 바랍니다.`;
 
-// ── 사용자 ──
-async function getUsers(){
-  return await gasGet('users');
-}
-async function deleteUser(key){ await gasDelete('users', key); }
-
-async function addUser(name, phone, pw, createdAt){
-  const users = await getUsers();
-  if(users.find(u=>u.name===name&&u.phone===phone)) return false;
-  await gasAdd('users', {name,phone,pw,createdAt});
-  return true;
-}
-async function findUser(name, phone, pw){
-  const users = await getUsers();
-  return users.find(u=>u.name===name&&u.phone===phone&&u.pw===pw)||null;
-}
-
-// ── 예매 ──
-async function getAdminBookings(){
-  const list = await gasGet('bookings');
-  // rowKey: 시트 행 식별자(고유), key: 공연 회차 식별자(SHOW_LABELS)
-  return list.map(b => ({...b, rowKey: b.key, key: b.showKey}));
-}
-async function addBooking(booking){
-  const payload = {...booking, showKey: booking.key};
-  delete payload.key;
-  const res = await gasAdd('bookings', payload);
-  return res.key;
-}
-async function updateBooking(rowKey, data){
-  const payload = {...data};
-  if(payload.key){ payload.showKey = payload.key; delete payload.key; }
-  await gasUpdate('bookings', rowKey, payload);
-}
-async function deleteBookingByKey(rowKey){ await gasDelete('bookings', rowKey); }
-
-async function getBookings(){
-  const phone = getLoginPhone();
-  if(!phone) return [];
-  const all = await getAdminBookings();
-  return all.filter(b=>b.phone===phone);
-}
-async function getBooking(){
-  const list = await getBookings();
-  const active = list.filter(b=>b.status!=='cancelled');
-  return active.length ? active[active.length-1] : null;
-}
-
-// ── 비밀번호 요청 ──
-async function getReqs(){
-  return await gasGet('pwreqs');
-}
-async function addReq(name,phone){
-  await gasAdd('pwreqs', {name,phone,time:new Date().toLocaleString('ko-KR'),done:false});
-}
-async function updateReq(key,data){ await gasUpdate('pwreqs', key, data); }
-async function deleteReq(key){ await gasDelete('pwreqs', key); }
-
-// ── 공연 콘텐츠 ──
-async function getContent(){ return await gasGetContent() || {}; }
-async function setContent(data){ await gasSetContent(data); }
-
-// ── 로그인 정보 (로컬만) ──
-function getLoginName(){ return sessionStorage.getItem('loginName')||localStorage.getItem('muah_loginName')||''; }
-function getLoginPhone(){ return sessionStorage.getItem('loginPhone')||localStorage.getItem('muah_loginPhone')||''; }
-function saveLogin(name,phone){
-  sessionStorage.setItem('loginName',name); sessionStorage.setItem('loginPhone',phone);
-  localStorage.setItem('muah_loginName',name); localStorage.setItem('muah_loginPhone',phone);
-}
-function clearLogin(){
-  ['loginName','loginPhone'].forEach(k=>sessionStorage.removeItem(k));
-  ['muah_loginName','muah_loginPhone'].forEach(k=>localStorage.removeItem(k));
-}
-
-// ══ PHONE FORMAT ══
-function fmtPhone(el){
-  let v=el.value.replace(/\D/g,'');
-  if(v.length>3&&v.length<=7) v=v.slice(0,3)+'-'+v.slice(3);
-  else if(v.length>7) v=v.slice(0,3)+'-'+v.slice(3,7)+'-'+v.slice(7,11);
-  el.value=v;
-}
-
-// ══ PIN RENDER ══
-const PIN_MAP = { l:'lDisp', s:'sDisp', c:'cDisp' };
-function renderPin(p, v){
-  const wrap = document.getElementById(PIN_MAP[p]);
-  if(!wrap) return;
-  const realEl = document.getElementById(p+'-pr');
-  const focused = realEl && document.activeElement === realEl;
-  wrap.innerHTML='';
-  for(let i=0;i<6;i++){
-    const b=document.createElement('div');
-    b.className='pin-box'+(v[i]?' filled':'')+(focused&&i===v.length?' cur':'');
-    b.textContent=v[i]?'●':'';
-    wrap.appendChild(b);
-  }
-}
-function pinIn(p){
-  const inp=document.getElementById(p+'-pr');
-  let v=inp.value.replace(/\D/g,'').slice(0,6);
-  inp.value=v; renderPin(p,v);
-  if(p==='s'){
-    const h=document.getElementById('sHint');
-    if(!v){h.textContent='';h.className='pin-hint';}
-    else if(v.length<6){h.textContent=`${v.length}/6자리 입력 중...`;h.className='pin-hint';}
-    else{h.textContent='✓ 아래 칸에 한 번 더 입력해주세요.';h.className='pin-hint ok';}
-  }
-  if(p==='c'){
-    const pw=document.getElementById('s-pr').value;
-    const h=document.getElementById('cHint');
-    if(!v){h.textContent='';h.className='pin-hint';return;}
-    if(v===pw&&v.length===6){h.textContent='✓ 일치해요.';h.className='pin-hint ok';}
-    else if(v.length===6){h.textContent='일치하지 않아요.';h.className='pin-hint err';}
-    else if(v.length>0){h.textContent=`${v.length}/6자리`;h.className='pin-hint';}
-  }
-}
-['l','s','c'].forEach(p=>{
-  const el=document.getElementById(p+'-pr');
-  if(el){
-    el.addEventListener('focus',()=>renderPin(p,el.value));
-    el.addEventListener('blur', ()=>renderPin(p,el.value));
-  }
-});
-['l','s','c'].forEach(p=>renderPin(p,''));
-
-// ══ USER TABS ══
-function switchUTab(t){
-  ['login','setup'].forEach(id=>document.getElementById('u-'+id).classList.toggle('active',id===t));
-  document.querySelectorAll('.u-tab').forEach((b,i)=>b.classList.toggle('active',(i===0&&t==='login')||(i===1&&t==='setup')));
-  if(t==='setup'){
-    document.getElementById('ss1').style.display='block';
-    document.getElementById('ss2').style.display='none';
-    document.getElementById('ssDone').style.display='none';
-    ['s-name','s-phone'].forEach(id=>document.getElementById(id).value='');
-    ['s-pr','c-pr'].forEach(id=>{ const e=document.getElementById(id); if(e) e.value=''; });
-    renderPin('s',''); renderPin('c','');
-    document.getElementById('sHint').textContent='';
-    document.getElementById('cHint').textContent='';
-  }
-}
-
-// ══ LOGIN ══
-async function doLogin(){
-  const name=document.getElementById('l-name').value.trim();
-  const phone=document.getElementById('l-phone').value.replace(/\D/g,'');
-  const pw=document.getElementById('l-pr').value;
-  if(!name){toast('이름을 입력해주세요.');return;}
-  if(phone.length<10){toast('올바른 번호를 입력해주세요.');return;}
-  if(pw.length<6){toast('비밀번호 6자리를 입력해주세요.');return;}
-  toast('확인 중...');
-  let u;
-  try {
-    u = await findUser(name, phone, pw);
-  } catch(e) {
-    toast('오류: ' + e.message);
-    console.error('doLogin error:', e);
-    return;
-  }
-  if(u){
-    saveLogin(u.name, u.phone);
-    document.getElementById('page-user').classList.add('hidden');
-    document.getElementById('homeWelcome').innerHTML=`<strong>${esc(u.name)}</strong>님, 환영해요!`;
-    document.getElementById('page-home').classList.add('active');
-  } else {
-    toast('계정을 찾을 수 없어요. 이름/번호/비밀번호 확인해주세요.');
-  }
-}
-function doLogout(){
-  clearLogin();
-  document.getElementById('page-home').classList.remove('active');
-  document.getElementById('page-user').classList.remove('hidden');
-  ['l-name','l-phone'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('l-pr').value='';
-  renderPin('l','');
-}
-function goPage(page){
-  if(page==='booking'){
-    document.getElementById('page-home').classList.remove('active');
-    document.getElementById('page-booking').classList.add('active');
-    renderBookingContent();
-    switchBookingTab(0);
-  } else if(page==='myticket'){
-    document.getElementById('page-home').classList.remove('active');
-    document.getElementById('page-myticket').classList.add('active');
-    renderMyTicket().catch(e=>console.error(e));
-  } else if(page==='change'){
-    document.getElementById('page-home').classList.remove('active');
-    document.getElementById('page-change').classList.add('active');
-    renderChangeTicket().catch(e=>console.error(e));
-  }
-}
-function goHome(){
-  ['page-booking','page-myticket','page-change'].forEach(id=>{
-    document.getElementById(id).classList.remove('active');
-  });
-  document.getElementById('page-home').classList.add('active');
-  document.getElementById('changePanel').classList.remove('open');
-}
-
-// ══ SETUP ══
-async function goStep2(){
-  const name=document.getElementById('s-name').value.trim();
-  const phone=document.getElementById('s-phone').value.replace(/\D/g,'');
-  if(!name){toast('이름을 입력해주세요.');return;}
-  if(phone.length<10){toast('올바른 번호를 입력해주세요.');return;}
-  toast('확인 중...');
-  let users;
-  try {
-    users = await getUsers();
-  } catch(e) {
-    toast('연결 오류가 발생했어요. 잠시 후 다시 시도해주세요.');
-    console.error('goStep2 error:', e);
-    return;
-  }
-  if(users.find(u=>u.name===name&&u.phone===phone)){
-    toast('이미 등록된 계정이에요. 비밀번호 전송 요청을 이용해주세요.');
-    return;
-  }
-  document.getElementById('ss1').style.display='none';
-  document.getElementById('ss2').style.display='block';
-}
-async function doSetPw(){
-  const pw=document.getElementById('s-pr').value;
-  const pw2=document.getElementById('c-pr').value;
-  if(pw.length<6){toast('비밀번호는 6자리를 모두 입력해주세요.');return;}
-  if(!pw2||pw2.length<6){toast('비밀번호 확인 칸을 6자리로 입력해주세요.');return;}
-  if(pw!==pw2){toast('비밀번호가 일치하지 않아요.');return;}
-  const name=document.getElementById('s-name').value.trim();
-  const phone=document.getElementById('s-phone').value.replace(/\D/g,'');
-  toast('1단계: Firebase 저장 중...');
-  try {
-    await Promise.race([
-      addUser(name, phone, pw, new Date().toLocaleString('ko-KR')),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('연결 시간 초과. 와이파이/데이터 확인 후 재시도해주세요.')), 30000))
-    ]);
-    document.getElementById('ss2').style.display='none';
-    document.getElementById('ssDone').style.display='block';
-    toast('✓ 저장됐어요.');
-  } catch(e) {
-    toast('오류: ' + e.message);
-    console.error('doSetPw error:', e);
-  }
-}
-
-// ══ PW REQUEST MODAL ══
-function openPwModal(){
-  document.getElementById('mForm').style.display='block';
-  document.getElementById('mSent').style.display='none';
-  document.getElementById('m-name').value='';
-  document.getElementById('m-phone').value='';
-  document.getElementById('pwModal').classList.add('open');
-}
-function closePwModal(){ document.getElementById('pwModal').classList.remove('open'); }
-
-async function submitReq(){
-  const name=document.getElementById('m-name').value.trim();
-  const phone=document.getElementById('m-phone').value.replace(/\D/g,'');
-  if(!name){toast('이름을 입력해주세요.');return;}
-  if(phone.length<10){toast('올바른 번호를 입력해주세요.');return;}
-  await addReq(name, phone);
-  document.getElementById('mForm').style.display='none';
-  document.getElementById('mSent').style.display='block';
-}
-
-function openAdminLock(){
-  const inp=document.getElementById('lock-pw');
-  inp.value=''; document.getElementById('lockErr').textContent='';
-  document.getElementById('adminLockOverlay').classList.add('open');
-  setTimeout(()=>inp.focus(),100);
-}
-function closeAdminLock(){ document.getElementById('adminLockOverlay').classList.remove('open'); }
-
-function tryAdminEnter(){
-  const v=document.getElementById('lock-pw').value;
-  if(!v){ document.getElementById('lockErr').textContent='비밀번호를 입력해주세요.'; return; }
-  if(v===ADMIN_PW){ closeAdminLock(); enterAdmin(); }
-  else {
-    document.getElementById('lockErr').textContent='비밀번호가 맞지 않아요.';
-    document.getElementById('lock-pw').value='';
-    setTimeout(()=>{ document.getElementById('lockErr').textContent=''; document.getElementById('lock-pw').focus(); },1000);
-  }
-}
-
-async function enterAdmin(){
-  document.getElementById('page-user').classList.add('hidden');
-  document.getElementById('page-home').classList.remove('active');
-  document.getElementById('page-admin').classList.add('active');
-  ['users','bookings','reqs','content'].forEach(id=>{
-    document.getElementById('ap-'+id).classList.toggle('active',id==='users');
-    document.getElementById('tab-'+id).classList.toggle('active',id==='users');
-  });
-  try {
-    await Promise.all([renderStats(), renderTable(), renderReqs()]);
-  } catch(e) {
-    console.error('enterAdmin error:', e);
-    toast('데이터를 불러오는 중 오류가 발생했어요.');
-  }
-}
-function adminLogout(){
-  document.getElementById('page-admin').classList.remove('active');
-  if(!document.getElementById('page-home').classList.contains('active'))
-    document.getElementById('page-user').classList.remove('hidden');
-}
-
-function switchAdminTab(t){
-  ['users','bookings','reqs','content'].forEach(id=>{
-    document.getElementById('ap-'+id).classList.toggle('active',id===t);
-    document.getElementById('tab-'+id).classList.toggle('active',id===t);
-  });
-  if(t==='reqs') renderReqs().catch(e=>console.error(e));
-  if(t==='content') loadContentEditor().catch(e=>console.error(e));
-  if(t==='bookings') renderBookingsAdmin().catch(e=>console.error(e));
-}
-
-async function renderStats(){
-  const [users,reqs,bookings]=await Promise.all([getUsers(),getReqs(),await getAdminBookings()]);
-  document.getElementById('statTotal').textContent=users.length;
-  document.getElementById('statReqs').textContent=reqs.filter(r=>!r.done).length;
-  document.getElementById('statBookings').textContent=bookings.filter(b=>b.status!=='cancelled').length;
-}
-async function updateBookingBadge(){
-  const bks=await getAdminBookings();
-  const b=document.getElementById('bookingBadge');
-  if(b){b.textContent=bks.length;b.classList.toggle('show',bks.length>0);}
-  const sb=document.getElementById('statBookings');
-  if(sb) sb.textContent=bks.filter(b=>b.status!=='cancelled').length;
-}
-async function updateReqBadge(){
-  const reqs=await getReqs();
-  const n=reqs.filter(r=>!r.done).length;
-  const b=document.getElementById('reqBadge');
-  if(b){b.textContent=n;b.classList.toggle('show',n>0);}
-  const s=document.getElementById('statReqs');
-  if(s) s.textContent=n;
-}
-
-let editId=null, selectedIds=new Set();
-function updateSelBtn(){
-  const btn=document.getElementById('btnSelDel');
-  if(btn){btn.disabled=selectedIds.size===0;btn.textContent=selectedIds.size>0?`선택 삭제 (${selectedIds.size})`:'선택 삭제';}
-}
-async function toggleAllCb(el){
-  const users=await getUsers();
-  if(el.checked) users.forEach(u=>selectedIds.add(u.key));
-  else selectedIds.clear();
-  updateSelBtn(); renderTable();
-}
-async function renderTable(){
-  const q=(document.getElementById('searchInp').value||'').trim().toLowerCase();
-  const qNum=q.replace(/\D/g,'');
-  const [allUsers,allBookings]=await Promise.all([getUsers(),getAdminBookings()]);
-  let users=allUsers;
-  if(q) users=users.filter(u=>u.name.toLowerCase().includes(q)||u.phone.includes(q)||(qNum&&u.phone.replace(/\D/g,'').includes(qNum)));
-  document.getElementById('statTotal').textContent=allUsers.length;
-  const cbAll=document.getElementById('cbAll');
-  if(cbAll) cbAll.checked=users.length>0&&users.every(u=>selectedIds.has(u.key));
-  const tb=document.getElementById('aTbody');
-  const bpMap={};
-  allBookings.forEach(b=>{if(!bpMap[b.phone])bpMap[b.phone]=[];bpMap[b.phone].push(b);});
-  if(!users.length){tb.innerHTML='<tr><td colspan="7" class="empty-td">등록된 계정이 없어요.</td></tr>';return;}
-  tb.innerHTML=users.map((u,i)=>{
-    const chk=selectedIds.has(u.key);
-    const ubks=(bpMap[u.phone]||[]).filter(b=>b.status!=='cancelled');
-    const bkCell=ubks.length?ubks.map(b=>{const s=SHOW_LABELS[b.key]||{day:'',time:''};const badge=b.status==='changed'?'<span style="font-size:10px;color:#7A6A30;background:#FFF8D6;padding:1px 5px;border-radius:8px;margin-left:3px;">변경</span>':'';return `<div style="font-size:11.5px;color:#5A4E3A;line-height:1.5;">${s.day} ${s.time}${badge}</div>`;}).join(''):'<span style="font-size:11px;color:#C8BFB0;">예매 없음</span>';
-    if(editId===u.key) return `<tr class="${chk?'selected':''}"><td><input type="checkbox" class="a-cb row-cb" ${chk?'checked':''} onchange="toggleCb('${u.key}',this)"></td><td>${i+1}</td><td><input class="td-input" id="e-name" value="${u.name.replace(/"/g,'&quot;')}" style="width:80px"></td><td><input class="td-input" id="e-phone" value="${u.phone}" style="width:130px"></td><td>${bkCell}</td><td class="td-date">${u.createdAt||''}</td><td><button class="btn-t-save" onclick="saveEdit('${u.key}')">저장</button><button class="btn-t-cancel" onclick="cancelEdit()">취소</button></td></tr>`;
-    return `<tr class="${chk?'selected':''}"><td><input type="checkbox" class="a-cb row-cb" ${chk?'checked':''} onchange="toggleCb('${u.key}',this)"></td><td>${i+1}</td><td class="td-name">${u.name}</td><td class="td-phone">${u.phone}</td><td>${bkCell}</td><td class="td-date">${u.createdAt||''}</td><td><button class="btn-t-edit" onclick="startEdit('${u.key}')">수정</button><button class="btn-t-del" onclick="confirmDel('${u.key}','${u.name.replace(/'/g,"\\'")}')">삭제</button></td></tr>`;
-  }).join('');
-}
-function toggleCb(key,el){
-  if(el.checked) selectedIds.add(key); else selectedIds.delete(key);
-  updateSelBtn();
-  const row=el.closest('tr');if(row)row.classList.toggle('selected',el.checked);
-}
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function startEdit(key){editId=key;renderTable();}
-function cancelEdit(){editId=null;renderTable();}
-async function saveEdit(key){
-  const name=document.getElementById('e-name').value.trim();
-  const phone=document.getElementById('e-phone').value.trim();
-  if(!name||!phone){toast('이름과 번호를 입력해주세요.');return;}
-  await fbUpdate('users/'+key,{name,phone});
-  editId=null;renderTable();toast('수정됐어요.');
-}
-
-async function renderReqs(){
-  const reqs=await getReqs();
-  const list=document.getElementById('reqList');
-  if(!reqs.length){list.innerHTML='<div class="req-empty">비밀번호 전송 요청이 없어요.</div>';return;}
-  list.innerHTML='<div class="req-list">'+reqs.map(r=>`<div class="req-card${r.done?' done':''}"><div class="req-card-info"><div class="req-name">${r.done?'':'<span class="new-dot"></span>'}${r.name}</div><div class="req-phone">${r.phone}</div><div class="req-time">${r.time}</div></div><div class="req-card-actions">${r.done?'<span style="font-size:12px;color:#5AAA78">✓ 처리 완료</span>':`<button class="btn-resolve" onclick="resolveReq('${r._key}')">처리 완료</button>`}<button class="btn-req-del" onclick="deleteReqItem('${r._key}')">삭제</button></div></div>`).join('')+'</div>';
-  updateReqBadge();
-}
-async function resolveReq(key){await updateReq(key,{done:true});renderReqs();toast('처리 완료로 표시했어요.');}
-async function deleteReqItem(key){await deleteReq(key);renderReqs();toast('삭제됐어요.');}
-
-let cfmCb=null;
-function openConfirm(title,msg,cb,okLabel){
-  document.getElementById('cTitle').textContent=title;
-  document.getElementById('cMsg').textContent=msg;
-  document.getElementById('cOkBtn').textContent=okLabel||'확인';
-  cfmCb=cb;document.getElementById('confirmOv').classList.add('open');
-}
-function closeConfirm(){document.getElementById('confirmOv').classList.remove('open');cfmCb=null;}
-
-
-async function confirmSelDel(){
-  if(selectedIds.size===0)return;
-  openConfirm('선택 삭제',`선택한 ${selectedIds.size}개 계정을 삭제할까요?`,async()=>{
-    for(const k of selectedIds)await deleteUser(k);
-    selectedIds.clear();updateSelBtn();renderTable();renderStats();toast('삭제됐어요.');
-  },'삭제');
-}
-async function confirmDel(key,name){
-  openConfirm('계정 삭제',`"${name}" 계정을 삭제할까요?`,async()=>{
-    await deleteUser(key);selectedIds.delete(key);updateSelBtn();renderTable();renderStats();toast('삭제됐어요.');
-  },'삭제');
-}
-async function confirmClear(){
-  openConfirm('전체 삭제','모든 계정 데이터를 삭제할까요?',async()=>{
-    await fbRemove('users');selectedIds.clear();updateSelBtn();renderTable();renderStats();toast('전체 삭제됐어요.');
-  },'삭제');
-}
-
-// ══ BOOKING PAGE ══
-const LS_CONTENT = 'muah_content';
-
-function getContent(){ try{return JSON.parse(localStorage.getItem(LS_CONTENT)||'{}')}catch{return{}} }
-function setContent(d){ localStorage.setItem(LS_CONTENT, JSON.stringify(d)) }
-
+let selectedShowKey = null;
 let bookingTabIdx = 0;
+
+// ══ 공연 콘텐츠 저장소 (localStorage) ══
+const LS_CONTENT = 'muah_content';
+function getContent(){
+  try{
+    const c = JSON.parse(localStorage.getItem(LS_CONTENT)||'{}');
+    if(!c.notice) c.notice = DEFAULT_NOTICE;
+    return c;
+  }catch{ return { notice: DEFAULT_NOTICE }; }
+}
+function setContent(d){ localStorage.setItem(LS_CONTENT, JSON.stringify(d)); }
+
+// ══ 페이지 전환 ══
+function goBooking(){
+  document.getElementById('page-home').classList.add('hidden');
+  document.getElementById('page-booking').classList.add('active');
+  renderBookingContent();
+  switchBookingTab(0);
+}
+function goBack(){
+  document.getElementById('page-booking').classList.remove('active');
+  document.getElementById('page-home').classList.remove('hidden');
+  selectedShowKey = null;
+  clearBookingForm();
+}
+function clearBookingForm(){
+  ['bf-name','bf-phone','bf-count','bf-message'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.value = '';
+  });
+}
+
+// ══ 탭 전환 ══
 function switchBookingTab(idx){
   bookingTabIdx = idx;
-  document.querySelectorAll('.booking-tab').forEach((b,i)=>b.classList.toggle('active',i===idx));
+  document.querySelectorAll('.booking-tab').forEach((b,i)=>b.classList.toggle('active', i===idx));
   document.getElementById('bookingTrack').style.transform = `translateX(-${idx*100}%)`;
 }
 
-async function renderBookingContent(){
-  const c = await getContent();
-  // 안내사항
+// ══ 공연 안내사항 / 공연 정보 / 포스터 렌더 ══
+function renderBookingContent(){
+  const c = getContent();
+
   const noticeEl = document.getElementById('noticeContent');
   if(noticeEl) noticeEl.textContent = c.notice || '';
-  if(noticeEl && !c.notice) noticeEl.innerHTML = '<div class="info-empty">관리자가 공연 안내사항을 등록하면 여기에 표시돼요.</div>';
 
-  // 포스터
   const posterWrap = document.getElementById('posterWrap');
   if(posterWrap){
-    if(c.poster){
-      posterWrap.innerHTML = `<div class="poster-wrap"><img src="${c.poster}" alt="공연 포스터"></div>`;
-    } else {
-      posterWrap.innerHTML = `<div class="poster-placeholder"><span class="ph-icon">🖼</span><span>포스터 준비 중</span></div>`;
-    }
+    if(c.poster) posterWrap.innerHTML = `<div class="poster-wrap"><img src="${c.poster}" alt="공연 포스터"></div>`;
+    else posterWrap.innerHTML = `<div class="poster-placeholder"><span class="ph-icon">🎭</span><span>포스터 준비 중</span></div>`;
   }
-  // 공연정보
+
   const infoEl = document.getElementById('showInfoContent');
-  if(infoEl) infoEl.textContent = c.showinfo || '';
-  if(infoEl && !c.showinfo) infoEl.innerHTML = '<div class="info-empty">관리자가 공연 정보를 등록하면 여기에 표시돼요.</div>';
+  if(infoEl){
+    infoEl.textContent = c.showinfo || '';
+  }
 }
 
-// 공연 정보 상수
-const SHOW_LABELS = {
-  '2025-08-22-14': { day:'8월 22일 토요일', time:'오후 2:00' },
-  '2025-08-22-18': { day:'8월 22일 토요일', time:'오후 6:00' },
-  '2025-08-23-13': { day:'8월 23일 일요일', time:'오후 1:00' },
-  '2025-08-23-17': { day:'8월 23일 일요일', time:'오후 5:00' },
-};
-// ══ 예매 저장소 통합 (단일 키: muah_bookings_admin) ══
-
-
-function getAdminBookings(){
-  try{
-    const raw = localStorage.getItem(LS_BOOKINGS_ADMIN);
-    if(!raw) return [];
-    const parsed = JSON.parse(raw);
-    if(Array.isArray(parsed)) return parsed;
-    return [];
-  }catch{return[]}
-}
-
-// 사용자용 — 전체 목록에서 현재 로그인 번호로 필터
-async function getBookings(){
-  const phone = getLoginPhone();
-  const all = await getAdminBookings();
-  return all.filter(b => b.phone === phone);
-}
-async function getBooking(){
-  const list = await getBookings();
-  const active = list.filter(b=>b.status!=='cancelled');
-  return active.length ? active[active.length-1] : null;
-}
-
-let pendingShowKey = null;
-
+// ══ 날짜 선택 ══
 function selectShow(key){
-  pendingShowKey = key;
-  const s = SHOW_LABELS[key];
-  document.getElementById('bcmDay').textContent = s.day;
-  document.getElementById('bcmTime').textContent = s.time;
-  const loginName = sessionStorage.getItem('loginName') || localStorage.getItem('muah_loginName') || '';
-  const loginPhone = sessionStorage.getItem('loginPhone') || localStorage.getItem('muah_loginPhone') || '';
-  document.getElementById('bcmUserInfo').innerHTML =
-    `예매자: <strong>${loginName}</strong><br>연락처: <strong>${loginPhone}</strong>`;
-  document.getElementById('bookingConfirmModal').classList.add('open');
-}
-function closeBookingModal(){
-  document.getElementById('bookingConfirmModal').classList.remove('open');
-  pendingShowKey = null;
-}
-// 모바일 호환: touchend + click 둘 다 처리
-
-
-async function confirmBooking(){
-  if(!pendingShowKey) return;
-  const name = sessionStorage.getItem('loginName') || localStorage.getItem('muah_loginName') || '';
-  const phone = sessionStorage.getItem('loginPhone') || localStorage.getItem('muah_loginPhone') || '';
-  if(!name || !phone){ toast('로그인 정보를 찾을 수 없어요. 다시 로그인해주세요.'); closeBookingModal(); return; }
-  const now = new Date().toLocaleString('ko-KR');
-  const booking = {
-    id: Date.now(), key: pendingShowKey,
-    name, phone, status: 'booked',
-    bookedAt: now, changedAt: null, originalKey: null,
-  };
-  try {
-    await addBooking(booking);
-    closeBookingModal();
-    pendingShowKey = null;
-    await updateBookingBadge();
-    toast('✓ 예매가 완료됐어요!');
-  } catch(e) {
-    toast('예매 중 오류가 발생했어요. 다시 시도해주세요.');
-    console.error('confirmBooking error:', e);
-  }
-}
-
-// ══ 예매 조회 ══
-async function renderMyTicket(){
-  const el = document.getElementById('myTicketContent');
-  el.innerHTML = '<div class="no-ticket-msg"><div class="nt-icon">⏳</div>불러오는 중...</div>';
-  let allBookings = [];
-  try {
-    allBookings = await getBookings();
-  } catch(e) {
-    el.innerHTML = '<div class="no-ticket-msg">데이터를 불러오지 못했어요.<br>새로고침 해주세요.</div>';
-    return;
-  }
-  if(!allBookings.length){
-    el.innerHTML = `<div class="no-ticket-msg">
-      <div class="nt-icon">🎫</div>
-      예매 내역이 없어요.<br><span style="font-size:12px;color:var(--muted2)">공연 예매하기에서 예매해주세요.</span>
-    </div>`;
-    return;
-  }
-  el.innerHTML = allBookings.map(booking => {
-    const s = SHOW_LABELS[booking.key] || {day:'',time:''};
-    const statusLabel = {booked:'예매 완료', changed:'날짜 변경됨', cancelled:'취소됨'}[booking.status]||'';
-    const statusClass = booking.status==='changed'?'badge-change':booking.status==='cancelled'?'mtc-val'+'':'';
-    return `<div class="my-ticket-card">
-      <div class="mtc-body">
-        <div class="mtc-eyebrow">예매 정보</div>
-        <div class="mtc-row"><span class="mtc-key">공연 일자</span><span class="mtc-val accent">${s.day}</span></div>
-        <div class="mtc-row"><span class="mtc-key">공연 시간</span><span class="mtc-val accent">${s.time}</span></div>
-        <div class="mtc-row"><span class="mtc-key">예매 상태</span><span class="mtc-val ${statusClass}">${statusLabel}</span></div>
-        <div class="mtc-row"><span class="mtc-key">예매 일시</span><span class="mtc-val" style="font-size:11px;color:var(--muted)">${booking.bookedAt}</span></div>
-        ${booking.changedAt?`<div class="mtc-row"><span class="mtc-key">변경 일시</span><span class="mtc-val" style="font-size:11px;color:var(--muted)">${booking.changedAt}</span></div>`:''}
-      </div>
-    </div>`;
-  }).join('');
-}
-
-// ══ 취소·변경 ══
-async function renderChangeTicket(){
-  const booking = await getBooking();
-  const el = document.getElementById('changeTicketContent');
-  document.getElementById('changePanel').classList.remove('open');
-
-  if(!booking || booking.status === 'cancelled'){
-    el.innerHTML = `<div class="no-ticket-msg">
-      <div class="nt-icon">📅</div>
-      취소·변경할 예매 내역이 없어요.
-    </div>`;
-    return;
-  }
-  const s = SHOW_LABELS[booking.key] || {day:'',time:''};
-  el.innerHTML = `
-    <div class="my-ticket-card">
-      <div class="mtc-body">
-        <div class="mtc-eyebrow">현재 예매 정보</div>
-        <div class="mtc-row"><span class="mtc-key">공연 일자</span><span class="mtc-val accent">${s.day}</span></div>
-        <div class="mtc-row"><span class="mtc-key">공연 시간</span><span class="mtc-val accent">${s.time}</span></div>
-        <div class="mtc-row"><span class="mtc-key">예매자</span><span class="mtc-val">${esc(booking.name)}</span></div>
-      </div>
-    </div>
-    <div class="status-action-btns">
-      <button class="btn-ticket-cancel" onclick="requestCancel()">취소하기</button>
-      <button class="btn-ticket-change" onclick="openChangePanel()">날짜 변경</button>
-    </div>`;
-}
-
-async function requestCancel(){
-  const booking = await getBooking();
-  if(!booking) return;
-  openConfirm('예매 취소', `${SHOW_LABELS[booking.key]?.day} ${SHOW_LABELS[booking.key]?.time}\n이 예매를 취소하시겠어요?`, async()=>{
-    if(booking.rowKey){
-      await updateBooking(booking.rowKey, {status:'cancelled', cancelledAt:new Date().toLocaleString('ko-KR')});
-    }
-    updateBookingBadge();
-    renderChangeTicket();
-    toast('예매가 취소됐어요.');
-  },'예매 취소');
-}
-
-async function openChangePanel(){
-  const booking = await getBooking();
-  if(!booking) return;
-  const grid = document.getElementById('changeDateGrid');
-  grid.innerHTML = Object.entries(SHOW_LABELS)
-    .filter(([k])=> k !== booking.key)
-    .map(([k, s])=>`
-      <button class="show-date-btn" onclick="confirmChange('${k}')">
-        <div>
-          <div class="sdb-day">${s.day}</div>
-          <div class="sdb-time">${s.time}</div>
-        </div>
-        <span class="sdb-tag">변경하기</span>
-      </button>`).join('');
-  document.getElementById('changePanel').classList.add('open');
-}
-
-async function confirmChange(newKey){
-  const s = SHOW_LABELS[newKey];
-  const booking = await getBooking();
-  openConfirm('날짜 변경', `${s.day} ${s.time}으로\n변경하시겠어요?`, async()=>{
-    if(!booking) return;
-    if(booking.rowKey){
-      await updateBooking(booking.rowKey, {
-        originalKey: booking.originalKey || booking.key,
-        key: newKey,
-        status: 'changed',
-        changedAt: new Date().toLocaleString('ko-KR')
-      });
-    }
-    updateBookingBadge();
-    document.getElementById('changePanel').classList.remove('open');
-    renderChangeTicket();
-    toast(`✓ ${s.day} ${s.time}으로 변경됐어요.`);
-  },'날짜 변경');
-}
-
-// ══ CONTENT EDITOR (관리자) ══
-
-async function saveContent(type){
-  const c = await getContent();
-  if(type==='notice'){
-    c.notice = document.getElementById('ce-notice').value.trim();
-    setContent(c);
-    toast('✓ 공연 안내사항이 저장됐어요.');
-  } else if(type==='showinfo'){
-    c.showinfo = document.getElementById('ce-showinfo').value.trim();
-    setContent(c);
-    toast('✓ 공연 정보가 저장됐어요.');
-  }
-}
-
-async function handlePosterUpload(e){
-  const file = e.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = async function(ev){
-    const c = await getContent();
-    c.poster = ev.target.result;
-    await setContent(c);
-    const prev = document.getElementById('ceImgPreview');
-    if(prev){
-      prev.innerHTML = `<img src="${c.poster}" alt="포스터" style="width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;">`;
-      prev.style.border = '1.5px solid #C9A96E';
-    }
-    document.getElementById('ceImgInput').value = '';
-    toast('✓ 포스터 이미지가 저장됐어요.');
-  };
-  reader.readAsDataURL(file);
-}
-
-async function removePoster(){
-  const c = await getContent();
-  delete c.poster;
-  setContent(c);
-  const prev = document.getElementById('ceImgPreview');
-  if(prev){
-    prev.style.border = '2px dashed #DDD5C4';
-    prev.innerHTML = `<div id="ceImgPlaceholder" style="display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;">
-      <span style="font-size:28px;opacity:.35">📷</span>
-      <span style="font-size:11px;color:#B0A090;text-align:center;">탭해서 업로드</span>
-    </div>`;
-  }
-  toast('이미지가 삭제됐어요.');
-}
-
-async function loadContentEditor(){
-  const c = await getContent();
-  document.getElementById('ce-notice').value = c.notice || '';
-  document.getElementById('ce-showinfo').value = c.showinfo || '';
-  const prev = document.getElementById('ceImgPreview');
-  if(!prev) return;
-  if(c.poster){
-    prev.innerHTML = `<img src="${c.poster}" alt="포스터" style="width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;">`;
-    prev.style.border = '1.5px solid #C9A96E';
-  } else {
-    prev.style.border = '2px dashed #DDD5C4';
-    prev.innerHTML = `<div id="ceImgPlaceholder" style="display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;">
-      <span style="font-size:28px;opacity:.35">📷</span>
-      <span style="font-size:11px;color:#B0A090;text-align:center;">탭해서 업로드</span>
-    </div>`;
-  }
-}
-
-
-// ══ 관리자 예매 관리 ══
-async function renderBookingsAdmin(){
-  const q = (document.getElementById('bookingSearchInp').value||'').trim().toLowerCase();
-  const qNum = q.replace(/\D/g,'');
-  const statusFilter = document.getElementById('bookingStatusFilter').value;
-  let list = await getAdminBookings();
-  if(q) list = list.filter(b=>
-    b.name.toLowerCase().includes(q)||
-    b.phone.includes(q)||
-    (qNum && b.phone.replace(/\D/g,'').includes(qNum))
-  );
-  if(statusFilter) list = list.filter(b=> b.status === statusFilter);
-  const el = document.getElementById('adminBookingList');
-  if(!list.length){ el.innerHTML = '<div class="booking-empty">예매 내역이 없어요.</div>'; return; }
-  el.innerHTML = list.map(b=>{
-    const s = SHOW_LABELS[b.key] || {day:'',time:''};
-    const statusMap = {booked:'예매 완료', changed:'날짜 변경', cancelled:'취소'};
-    const statusClass = {booked:'status-booked', changed:'status-changed', cancelled:'status-cancelled'};
-    const origS = b.originalKey ? SHOW_LABELS[b.originalKey] : null;
-    return `<div class="a-booking-card">
-      <div class="a-booking-header">
-        <div>
-          <div class="a-booking-name">${esc(b.name)}</div>
-          <div class="a-booking-phone">${esc(b.phone)}</div>
-        </div>
-        <span class="a-booking-status ${statusClass[b.status]||'status-booked'}">${statusMap[b.status]||''}</span>
-      </div>
-      <div class="a-booking-time">${s.day} · ${s.time}</div>
-      ${origS?`<div class="a-booking-meta">원래 예매: ${origS.day} ${origS.time}</div>`:''}
-      <div class="a-booking-meta">예매: ${b.bookedAt||''}${b.changedAt?' · 변경: '+b.changedAt:''}${b.cancelledAt?' · 취소: '+b.cancelledAt:''}</div>
-      <div class="a-booking-actions">
-        <button class="btn-ab-del" onclick="deleteAdminBooking('${b.rowKey}')">기록 삭제</button>
-      </div>
-    </div>`;
-  }).join('');
-}
-async function deleteAdminBooking(id){
-  openConfirm('예매 기록 삭제','이 예매 기록을 삭제할까요?',async()=>{
-    await deleteBookingByKey(id);
-    renderBookingsAdmin(); updateBookingBadge(); renderStats(); toast('삭제됐어요.');
+  selectedShowKey = key;
+  document.querySelectorAll('.show-date-btn').forEach(btn=>{
+    btn.classList.toggle('selected', btn.getAttribute('onclick').includes(key));
   });
 }
 
-let tTm;
-function toast(msg){
-  const el=document.getElementById('toast');
-  el.textContent=msg; el.classList.add('show');
-  clearTimeout(tTm); tTm=setTimeout(()=>el.classList.remove('show'),3000);
+// ══ 전화번호 포맷 ══
+function fmtPhone(el){
+  let v = el.value.replace(/\D/g,'');
+  if(v.length>3 && v.length<=7) v = v.slice(0,3)+'-'+v.slice(3);
+  else if(v.length>7) v = v.slice(0,3)+'-'+v.slice(3,7)+'-'+v.slice(7,11);
+  el.value = v;
 }
 
-// ══ 자동 로그인 ══
+// ══ 날짜 선택 후 다음 단계 — 예매자 정보 입력 모달 ══
+function goBookingStep2(){
+  if(!selectedShowKey){ toast('공연 날짜를 선택해주세요.'); return; }
+  const s = SHOW_LABELS[selectedShowKey];
+  document.getElementById('bfSelectedShow').innerHTML = `선택한 공연: <strong>${s.day} ${s.time}</strong>`;
+  document.getElementById('bookingFormModal').classList.add('open');
+}
+function closeBookingFormModal(){
+  document.getElementById('bookingFormModal').classList.remove('open');
+}
 
+// ══ 예매 확인 모달 ══
+function openBookingConfirm(){
+  const name = document.getElementById('bf-name').value.trim();
+  const phone = document.getElementById('bf-phone').value.replace(/\D/g,'');
+  const count = document.getElementById('bf-count').value.trim();
 
-window.addEventListener('DOMContentLoaded', function(){
-  // 이벤트 리스너 등록
-  var pwModal = document.getElementById('pwModal');
-  if(pwModal) pwModal.addEventListener('click', function(e){ if(e.target===this) closePwModal(); });
+  if(!name){ toast('성함을 입력해주세요.'); return; }
+  if(phone.length<10){ toast('올바른 연락처를 입력해주세요.'); return; }
+  if(!count || isNaN(count) || Number(count)<1){ toast('총 인원 수를 숫자로 입력해주세요.'); return; }
 
-  var lockOverlay = document.getElementById('adminLockOverlay');
-  if(lockOverlay) lockOverlay.addEventListener('click', function(e){ if(e.target===this) closeAdminLock(); });
+  const s = SHOW_LABELS[selectedShowKey];
+  document.getElementById('bcSummary').innerHTML =
+    `<strong>${name}</strong>님 (총 ${count}명)<br>${s.day} ${s.time}<br>위 내용으로 예매하시겠어요?`;
+  closeBookingFormModal();
+  document.getElementById('confirmBookingModal').classList.add('open');
+}
+function closeBookingModal(){
+  document.getElementById('confirmBookingModal').classList.remove('open');
+}
 
-  var cOkBtn = document.getElementById('cOkBtn');
-  if(cOkBtn) cOkBtn.addEventListener('click', function(){ if(cfmCb) cfmCb(); closeConfirm(); });
+// ══ 예매 제출 ══
+const GAS_URL = "https://script.google.com/macros/s/AKfycbzNGRfIMgERj-Xw8gdwrAvvH_Bb02f18qrsbia9pUjpKCQBRV6nspN9dp5EOE8KY2AQ/exec";
 
-  var bcModal = document.getElementById('bookingConfirmModal');
-  if(bcModal){
-    bcModal.addEventListener('click', function(e){ if(e.target===this) closeBookingModal(); });
-    bcModal.addEventListener('touchend', function(e){ if(e.target===this){ e.preventDefault(); closeBookingModal(); } });
+async function submitBooking(){
+  const name = document.getElementById('bf-name').value.trim();
+  const phone = document.getElementById('bf-phone').value.replace(/\D/g,'');
+  const count = document.getElementById('bf-count').value.trim();
+  const message = document.getElementById('bf-message').value.trim();
+  const s = SHOW_LABELS[selectedShowKey];
+
+  const bookingData = {
+    name, phone, count,
+    message,
+    showKey: selectedShowKey,
+    showLabel: `${s.day} ${s.time}`,
+    bookedAt: new Date().toLocaleString('ko-KR')
+  };
+
+  toast('예매 처리 중...');
+
+  try {
+    const res = await fetch(GAS_URL + "?data=" + encodeURIComponent(JSON.stringify(bookingData)));
+    const result = await res.json();
+    if(!result.success) throw new Error(result.error || '알 수 없는 오류');
+  } catch(err) {
+    toast('예매 전송 중 오류가 발생했어요. 다시 시도해주세요.');
+    console.error('submitBooking error:', err);
+    return;
   }
 
-  // 자동 로그인
-  (async function(){
-    var savedName = localStorage.getItem('muah_loginName');
-    var savedPhone = localStorage.getItem('muah_loginPhone');
-    if(savedName && savedPhone){
-      var users = await getUsers();
-      var match = users.find(function(u){ return u.name===savedName && u.phone===savedPhone; });
-      if(match){
-        saveLogin(savedName, savedPhone);
-        document.getElementById('homeWelcome').innerHTML = '<strong>'+savedName+'</strong>님, 환영해요!';
-        document.getElementById('page-user').classList.add('hidden');
-        document.getElementById('page-home').classList.add('active');
-      } else {
-        clearLogin();
-      }
-    }
-  })();
+  closeBookingModal();
+  document.getElementById('doneSummary').innerHTML =
+    `<strong>${name}</strong>님,<br>${s.day} ${s.time}<br>예매가 완료됐어요.`;
+  document.getElementById('doneModal').classList.add('open');
+}
+function closeDoneModal(){
+  document.getElementById('doneModal').classList.remove('open');
+  goBack();
+}
+
+// ══ TOAST ══
+let tTm;
+function toast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(tTm);
+  tTm = setTimeout(()=>el.classList.remove('show'), 3000);
+}
+
+// ══ DOM 로드 후 이벤트 리스너 등록 ══
+window.addEventListener('DOMContentLoaded', function(){
+  const bfModal = document.getElementById('bookingFormModal');
+  if(bfModal) bfModal.addEventListener('click', function(e){ if(e.target===this) closeBookingFormModal(); });
+
+  const cbModal = document.getElementById('confirmBookingModal');
+  if(cbModal) cbModal.addEventListener('click', function(e){ if(e.target===this) closeBookingModal(); });
+
+  const dModal = document.getElementById('doneModal');
+  if(dModal) dModal.addEventListener('click', function(e){ if(e.target===this) closeDoneModal(); });
 });
 
 </script>
+</body>
+</html>
