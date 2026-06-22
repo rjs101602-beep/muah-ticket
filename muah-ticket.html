@@ -735,43 +735,22 @@ function submitBooking(){
   console.log('[submitBooking] GAS_URL:', GAS_URL);
   console.log('[submitBooking] bookingData:', bookingData);
 
-  // ── 진짜 form 제출 방식 (가장 안정적, CORS 영향 없음) ──
-  // 1) 숨겨진 타겟 iframe 준비
-  let targetFrame = document.getElementById('gasTargetFrame');
-  if(!targetFrame){
-    targetFrame = document.createElement('iframe');
-    targetFrame.name = 'gasTargetFrame';
-    targetFrame.id = 'gasTargetFrame';
-    targetFrame.style.display = 'none';
-    document.body.appendChild(targetFrame);
-  }
+  // ── img 태그 방식 (가장 확실, 트래킹 픽셀과 동일한 원리) ──
+  const url = GAS_URL + "?data=" + encodeURIComponent(JSON.stringify(bookingData));
+  console.log('[submitBooking] 전송 URL:', url);
 
-  // 2) form을 동적으로 만들어서 그 iframe으로 제출
-  const form = document.createElement('form');
-  form.method = 'GET';
-  form.action = GAS_URL;
-  form.target = 'gasTargetFrame';
+  const img = new Image();
+  img.onload = function(){ console.log('[submitBooking] img onload (성공 추정)'); };
+  img.onerror = function(){ console.log('[submitBooking] img onerror (그래도 요청은 전송됨 - GAS가 이미지가 아닌 JSON을 반환해서 발생하는 정상 현상)'); };
+  img.src = url;
 
-  const input = document.createElement('input');
-  input.type = 'hidden';
-  input.name = 'data';
-  input.value = JSON.stringify(bookingData);
-  form.appendChild(input);
-
-  document.body.appendChild(form);
-  console.log('[submitBooking] form action:', form.action);
-  console.log('[submitBooking] form data value:', input.value);
-  form.submit();
-  console.log('[submitBooking] form.submit() 호출 완료');
-  document.body.removeChild(form);
-
-  // 전송 후 완료 화면으로 전환 (form 제출은 응답 확인이 안 되므로 약간 대기)
+  // 요청 전송 후 완료 화면으로 전환
   setTimeout(()=>{
     closeBookingModal();
     document.getElementById('doneSummary').innerHTML =
       `<strong>${name}</strong>님,<br>${s.day} ${s.time}<br>예매가 완료됐어요.`;
     document.getElementById('doneModal').classList.add('open');
-  }, 1000);
+  }, 1200);
 }
 function closeDoneModal(){
   document.getElementById('doneModal').classList.remove('open');
