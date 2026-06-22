@@ -713,8 +713,16 @@ function closeBookingModal(){
   document.getElementById('confirmBookingModal').classList.remove('open');
 }
 
-// ══ 예매 제출 ══
-const GAS_URL = "https://script.google.com/macros/s/AKfycbyh1lcu-LyjyqRkchGe669d3VFvjLYAxO_NCzl22rUe5qM4drQ_SaLI1RmPni6Khd_a/exec";
+// ══ 예매 제출 — Google Forms 연동 ══
+const FORM_ACTION = "https://docs.google.com/forms/d/e/1FAIpQLSftJfYFWMYMP45-iPnFIlyBabD0FFxdUYGoohmc_TNWEPT6Qg/formResponse";
+const FORM_FIELDS = {
+  name:      "entry.122261348",
+  phone:     "entry.526378259",
+  bookedAt:  "entry.1958870224",
+  showLabel: "entry.602864043",
+  count:     "entry.641299743",
+  message:   "entry.2011489665"
+};
 
 function submitBooking(){
   const name = document.getElementById('bf-name').value.trim();
@@ -724,33 +732,38 @@ function submitBooking(){
   const s = SHOW_LABELS[selectedShowKey];
 
   const bookingData = {
-    name, phone, count,
-    message,
-    showKey: selectedShowKey,
-    showLabel: `${s.day} ${s.time}`,
-    bookedAt: new Date().toLocaleString('ko-KR')
+    name, phone, count, message,
+    bookedAt: new Date().toLocaleString('ko-KR'),
+    showLabel: `${s.day} ${s.time}`
   };
 
   toast('예매 처리 중...');
-  console.log('[submitBooking] GAS_URL:', GAS_URL);
+  console.log('[submitBooking] FORM_ACTION:', FORM_ACTION);
   console.log('[submitBooking] bookingData:', bookingData);
 
-  // ── img 태그 방식 (가장 확실, 트래킹 픽셀과 동일한 원리) ──
-  const url = GAS_URL + "?data=" + encodeURIComponent(JSON.stringify(bookingData));
-  console.log('[submitBooking] 전송 URL:', url);
+  // ── fetch + no-cors POST 방식 (Google Forms 표준 제출 방법) ──
+  const formData = new FormData();
+  Object.entries(FORM_FIELDS).forEach(([key, entryId])=>{
+    formData.append(entryId, bookingData[key]);
+    console.log(`[submitBooking] ${entryId} = ${bookingData[key]}`);
+  });
 
-  const img = new Image();
-  img.onload = function(){ console.log('[submitBooking] img onload (성공 추정)'); };
-  img.onerror = function(){ console.log('[submitBooking] img onerror (그래도 요청은 전송됨 - GAS가 이미지가 아닌 JSON을 반환해서 발생하는 정상 현상)'); };
-  img.src = url;
+  fetch(FORM_ACTION, {
+    method: 'POST',
+    mode: 'no-cors',
+    body: formData
+  }).then(()=>{
+    console.log('[submitBooking] fetch 완료');
+  }).catch(err=>{
+    console.error('[submitBooking] fetch 에러:', err);
+  });
 
-  // 요청 전송 후 완료 화면으로 전환
   setTimeout(()=>{
     closeBookingModal();
     document.getElementById('doneSummary').innerHTML =
       `<strong>${name}</strong>님,<br>${s.day} ${s.time}<br>예매가 완료됐어요.`;
     document.getElementById('doneModal').classList.add('open');
-  }, 1200);
+  }, 1000);
 }
 function closeDoneModal(){
   document.getElementById('doneModal').classList.remove('open');
