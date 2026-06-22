@@ -734,13 +734,17 @@ async function submitBooking(){
   toast('예매 처리 중...');
 
   try {
+    console.log('[submitBooking] 요청 시작:', GAS_URL);
     await fetch(GAS_URL + "?data=" + encodeURIComponent(JSON.stringify(bookingData)), {
       method: 'GET',
       mode: 'no-cors'
     });
+    console.log('[submitBooking] 요청 완료 (no-cors라 응답 내용 확인 불가)');
   } catch(err) {
-    console.error('submitBooking error:', err);
-    toast('예매 전송 중 오류가 발생했어요. 다시 시도해주세요.');
+    console.error('[submitBooking] 에러 종류:', err.name);
+    console.error('[submitBooking] 에러 메시지:', err.message);
+    console.error('[submitBooking] 전체:', err);
+    toast('오류: ' + err.name + ' - ' + err.message);
     return;
   }
 
