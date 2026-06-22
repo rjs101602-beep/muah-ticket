@@ -733,23 +733,40 @@ function submitBooking(){
 
   toast('예매 처리 중...');
 
-  // ── iframe + GET 방식으로 전송 (CORS 제약 없음) ──
-  let iframe = document.getElementById('gasIframe');
-  if(!iframe){
-    iframe = document.createElement('iframe');
-    iframe.id = 'gasIframe';
-    iframe.style.display = 'none';
-    document.body.appendChild(iframe);
+  // ── 진짜 form 제출 방식 (가장 안정적, CORS 영향 없음) ──
+  // 1) 숨겨진 타겟 iframe 준비
+  let targetFrame = document.getElementById('gasTargetFrame');
+  if(!targetFrame){
+    targetFrame = document.createElement('iframe');
+    targetFrame.name = 'gasTargetFrame';
+    targetFrame.id = 'gasTargetFrame';
+    targetFrame.style.display = 'none';
+    document.body.appendChild(targetFrame);
   }
-  iframe.src = GAS_URL + "?data=" + encodeURIComponent(JSON.stringify(bookingData));
 
-  // iframe 전송은 응답 확인이 안 되니, 잠시 후 완료 화면으로 전환
+  // 2) form을 동적으로 만들어서 그 iframe으로 제출
+  const form = document.createElement('form');
+  form.method = 'GET';
+  form.action = GAS_URL;
+  form.target = 'gasTargetFrame';
+
+  const input = document.createElement('input');
+  input.type = 'hidden';
+  input.name = 'data';
+  input.value = JSON.stringify(bookingData);
+  form.appendChild(input);
+
+  document.body.appendChild(form);
+  form.submit();
+  document.body.removeChild(form);
+
+  // 전송 후 완료 화면으로 전환 (form 제출은 응답 확인이 안 되므로 약간 대기)
   setTimeout(()=>{
     closeBookingModal();
     document.getElementById('doneSummary').innerHTML =
       `<strong>${name}</strong>님,<br>${s.day} ${s.time}<br>예매가 완료됐어요.`;
     document.getElementById('doneModal').classList.add('open');
-  }, 800);
+  }, 1000);
 }
 function closeDoneModal(){
   document.getElementById('doneModal').classList.remove('open');
