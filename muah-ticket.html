@@ -716,7 +716,7 @@ function closeBookingModal(){
 // ══ 예매 제출 ══
 const GAS_URL = "https://script.google.com/macros/s/AKfycbzNGRfIMgERj-Xw8gdwrAvvH_Bb02f18qrsbia9pUjpKCQBRV6nspN9dp5EOE8KY2AQ/exec";
 
-async function submitBooking(){
+function submitBooking(){
   const name = document.getElementById('bf-name').value.trim();
   const phone = document.getElementById('bf-phone').value.replace(/\D/g,'');
   const count = document.getElementById('bf-count').value.trim();
@@ -733,25 +733,23 @@ async function submitBooking(){
 
   toast('예매 처리 중...');
 
-  try {
-    console.log('[submitBooking] 요청 시작:', GAS_URL);
-    await fetch(GAS_URL + "?data=" + encodeURIComponent(JSON.stringify(bookingData)), {
-      method: 'GET',
-      mode: 'no-cors'
-    });
-    console.log('[submitBooking] 요청 완료 (no-cors라 응답 내용 확인 불가)');
-  } catch(err) {
-    console.error('[submitBooking] 에러 종류:', err.name);
-    console.error('[submitBooking] 에러 메시지:', err.message);
-    console.error('[submitBooking] 전체:', err);
-    toast('오류: ' + err.name + ' - ' + err.message);
-    return;
+  // ── iframe + GET 방식으로 전송 (CORS 제약 없음) ──
+  let iframe = document.getElementById('gasIframe');
+  if(!iframe){
+    iframe = document.createElement('iframe');
+    iframe.id = 'gasIframe';
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
   }
+  iframe.src = GAS_URL + "?data=" + encodeURIComponent(JSON.stringify(bookingData));
 
-  closeBookingModal();
-  document.getElementById('doneSummary').innerHTML =
-    `<strong>${name}</strong>님,<br>${s.day} ${s.time}<br>예매가 완료됐어요.`;
-  document.getElementById('doneModal').classList.add('open');
+  // iframe 전송은 응답 확인이 안 되니, 잠시 후 완료 화면으로 전환
+  setTimeout(()=>{
+    closeBookingModal();
+    document.getElementById('doneSummary').innerHTML =
+      `<strong>${name}</strong>님,<br>${s.day} ${s.time}<br>예매가 완료됐어요.`;
+    document.getElementById('doneModal').classList.add('open');
+  }, 800);
 }
 function closeDoneModal(){
   document.getElementById('doneModal').classList.remove('open');
